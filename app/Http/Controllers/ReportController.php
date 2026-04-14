@@ -53,15 +53,56 @@ class ReportController extends Controller
             ->sum(DB::raw('CAST(amount as DECIMAL(12,2))'));
 
         // Get revenue breakdown by category based on payment date and period
-        $revenueByCategory = DB::table('payments')
+        // Calculate proportional distribution of payments to categories
+        $allPayments = DB::table('payments')
             ->join('orders', 'payments.order_id', '=', 'orders.id')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
             ->whereBetween(DB::raw('DATE(payments.payment_date)'), [$startDate->toDateString(), $endDate->toDateString()])
-            ->select('products.category', DB::raw('SUM(CAST(payments.amount as DECIMAL(12,2))) as total_revenue'))
-            ->groupBy('products.category')
-            ->orderByDesc('total_revenue')
+            ->select('payments.id', 'payments.order_id', 'payments.amount', 'payments.payment_date')
             ->get();
+        
+        $revenueByCategory = collect();
+        
+        foreach ($allPayments as $payment) {
+            // Get all items for this order
+            $orderItems = DB::table('order_items')
+                ->join('products', 'order_items.product_id', '=', 'products.id')
+                ->where('order_items.order_id', $payment->order_id)
+                ->select('products.category', 
+                    DB::raw('(CAST(order_items.price as DECIMAL(12,2)) - CAST(COALESCE(order_items.discount, 0) as DECIMAL(12,2))) * CAST(order_items.quantity as DECIMAL(12,2)) as item_total'))
+                ->get();
+            
+            if ($orderItems->isEmpty()) {
+                continue;
+            }
+            
+            // Group by category and sum up the item totals
+            $categoryTotals = $orderItems->groupBy('category')
+                ->map(fn($items) => $items->sum('item_total'));
+            
+            $totalOrderValue = $categoryTotals->sum();
+            
+            // Distribute payment proportionally
+            if ($totalOrderValue > 0) {
+                foreach ($categoryTotals as $category => $categoryValue) {
+                    $proportion = $categoryValue / $totalOrderValue;
+                    $allocatedAmount = $payment->amount * $proportion;
+                    
+                    if ($revenueByCategory->has($category)) {
+                        $revenueByCategory[$category] += $allocatedAmount;
+                    } else {
+                        $revenueByCategory[$category] = $allocatedAmount;
+                    }
+                }
+            }
+        }
+        
+        // Convert to collection with proper format
+        $revenueByCategory = $revenueByCategory->map(function($amount, $category) {
+            return (object)[
+                'category' => $category,
+                'total_revenue' => round($amount, 2)
+            ];
+        })->sortByDesc('total_revenue')->values();
 
         // Get revenue breakdown by payment method
         $revenueByPaymentMethod = DB::table('payments')

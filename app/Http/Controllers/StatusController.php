@@ -28,25 +28,20 @@ class StatusController extends Controller
             $endDate = \Carbon\Carbon::now()->endOfDay();
         }
 
-        // Ambil orders berdasarkan role user
+        // Ambil SEMUA orders tanpa pagination
         $query = Order::with('items', 'items.product', 'customer')
             ->whereBetween('created_at', [$startDate, $endDate]);
 
-        // Semua role (penerima, kasir, operator, admin) bisa lihat semua orders
-        // Tidak ada filter berdasarkan user
+        // Semua role bisa lihat semua orders
+        // Get all orders (no pagination)
+        $orders = $query->orderBy('created_at', 'desc')->get();
 
-        // Get all orders untuk statistics
-        $allOrders = $query->get();
-
-        // Calculate statistics
-        $unpaidOrders = $allOrders->where('payment_status', 'unpaid')->count();
-        $notPrintedOrders = $allOrders->where('print_status', 'pending')->count();
+        // Calculate statistics dari semua orders
+        $unpaidOrders = $orders->where('payment_status', 'unpaid')->count();
+        $notPrintedOrders = $orders->where('print_status', 'pending')->count();
         
-        // Count orders not picked up (belum diambil) - count orders, not items
-        $waitingItemsCount = $allOrders->where('pickup_status', 'waiting')->count();
-
-        // Get paginated orders (recent first)
-        $orders = $query->orderBy('created_at', 'desc')->paginate(15);
+        // Count orders not picked up (belum diambil)
+        $waitingItemsCount = $orders->where('pickup_status', 'waiting')->count();
 
         return view('orderstatus', [
             'orders' => $orders,

@@ -334,6 +334,12 @@
     let allOrders = @json($orders);
     let isLoading = false;
 
+    // Expand Button Setup - HARUS SEBELUM filterTable()
+    const expandBtn = document.getElementById('expandBtn');
+    const expandContainer = document.getElementById('expandContainer');
+
+    console.log('Button elements:', { expandBtn, expandContainer });
+
     // Initialize dropdown value from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const currentPeriod = urlParams.get('period') || '7';
@@ -344,12 +350,6 @@
     
     filterTable();
 
-    // Expand Button Setup
-    const expandBtn = document.getElementById('expandBtn');
-    const expandContainer = document.getElementById('expandContainer');
-
-    console.log('Button elements:', { expandBtn, expandContainer });
-    
     if (expandBtn) {
         expandBtn.addEventListener('click', function(e) {
             console.log('Button clicked!', { isLoading, itemsShown, itemsPerLoad });

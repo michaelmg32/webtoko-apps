@@ -354,34 +354,31 @@
 
     function updateOrderVisibility() {
         const allRows = document.querySelectorAll('.order-row');
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
         
-        let visibleCount = 0;
-        let totalMatching = 0;
+        // Count visible rows berdasarkan current filter
+        let visibleIndex = 0;
+        let totalVisible = 0;
         
-        // Count and display rows based on filter + itemsShown
         allRows.forEach((row) => {
-            const text = (row.dataset.customerName || '').toLowerCase() + (row.dataset.orderCode || '').toLowerCase();
-            const isTaken = row.dataset.status === 'taken';
-            const matchesSearch = text.includes(search);
-            const isMatching = matchesSearch && (!hideTaken || !isTaken);
+            const isFiltered = row.getAttribute('data-filtered') !== 'false';
             
-            if (isMatching) {
-                totalMatching++;
-                if (totalMatching <= itemsShown) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
+            // Skip jika di-filter out
+            if (!isFiltered) {
+                row.style.display = 'none';
+                return;
+            }
+            
+            totalVisible++;
+            if (visibleIndex < itemsShown) {
+                row.style.display = '';
+                visibleIndex++;
             } else {
                 row.style.display = 'none';
             }
         });
 
-        // Show/hide expand button
-        if (totalMatching > itemsShown) {
+        // Tampilkan button jika ada lebih banyak yang bisa di-load
+        if (totalVisible > itemsShown) {
             expandContainer.style.display = 'flex';
         } else {
             expandContainer.style.display = 'none';
@@ -394,8 +391,9 @@
         expandBtn.disabled = true;
         expandBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div><span>Memuat...</span>';
         
+        itemsShown += itemsPerLoad;
+        
         setTimeout(() => {
-            itemsShown += itemsPerLoad;
             updateOrderVisibility();
             expandBtn.disabled = false;
             expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i><span>Muat Lebih Banyak</span>';
@@ -503,11 +501,15 @@
     function filterTable() {
         const search = document.getElementById('searchInput').value.toLowerCase();
         const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
+        
+        // Filter rows based on search & checkbox
         document.querySelectorAll('.order-row').forEach(row => {
             const text = (row.dataset.customerName || '').toLowerCase() + (row.dataset.orderCode || '').toLowerCase();
             const isTaken = row.dataset.status === 'taken';
             const matchesSearch = text.includes(search);
-            row.style.display = matchesSearch && (!hideTaken || !isTaken) ? '' : 'none';
+            const shouldShow = matchesSearch && (!hideTaken || !isTaken);
+            
+            row.setAttribute('data-filtered', shouldShow ? 'true' : 'false');
         });
         
         itemsShown = 15; // Reset to 15 when filtering

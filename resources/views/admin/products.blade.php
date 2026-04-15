@@ -47,15 +47,15 @@
         </div>
     </div>
 
-    <div id="productListContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div id="productListContainer" class="space-y-3">
         @forelse($products as $product)
             @php
                 $categoryKey = in_array(strtolower($product->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($product->category), ['goods', 'barang']) ? 'barang' : strtolower($product->category));
                 $categoryBg = match($categoryKey) {
-                    'cetak' => 'from-blue-600 to-blue-700',
-                    'barang' => 'from-orange-600 to-orange-700',
-                    'studio' => 'from-purple-600 to-purple-700',
-                    default => 'from-gray-600 to-gray-700'
+                    'cetak' => 'bg-blue-100 text-blue-700',
+                    'barang' => 'bg-orange-100 text-orange-700',
+                    'studio' => 'bg-purple-100 text-purple-700',
+                    default => 'bg-gray-100 text-gray-600'
                 };
                 $categoryIcon = match($categoryKey) {
                     'cetak' => 'fa-print',
@@ -71,70 +71,66 @@
                 };
             @endphp
             
-            <div class="product-row bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group relative flex flex-col h-full"
+            <div class="product-row bg-white rounded-xl border border-gray-100 hover:shadow-lg hover:border-blue-200 transition-all duration-200 group flex items-center justify-between p-5"
+                data-product-id="{{ $product->id }}"
                 data-category="{{ $categoryKey }}"
                 data-name="{{ strtolower($product->name) }}"
                 data-sku="{{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}">
                 
-                <!-- Image Placeholder Header -->
-                <div class="bg-gradient-to-br {{ $categoryBg }} h-32 flex items-center justify-center relative overflow-hidden group">
-                    <div class="absolute inset-0 opacity-10">
-                        <i class="fas {{ $categoryIcon }} text-9xl text-white absolute -right-8 -top-8 transform rotate-12"></i>
+                <!-- Left: Icon & Info -->
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <!-- Icon -->
+                    <div class="flex-shrink-0">
+                        <div class="w-14 h-14 bg-gradient-to-br {{ match($categoryKey) { 'cetak' => 'from-blue-500 to-blue-600', 'barang' => 'from-orange-500 to-orange-600', 'studio' => 'from-purple-500 to-purple-600', default => 'from-gray-500 to-gray-600' } }} rounded-xl flex items-center justify-center text-white shadow-md">
+                            <i class="fas {{ $categoryIcon }} text-lg"></i>
+                        </div>
                     </div>
-                    <i class="fas {{ $categoryIcon }} text-6xl text-white/80 relative z-10 group-hover:scale-110 transition-transform"></i>
                     
-                    <!-- Category Badge -->
-                    <span class="absolute top-3 right-3 bg-white text-gray-900 text-xs font-black px-3 py-1.5 rounded-full shadow-lg">
-                        {{ $categoryLabel }}
-                    </span>
-                    
-                    <!-- Stock Indicator -->
-                    <div class="absolute bottom-3 left-3 flex items-center gap-1 bg-white/95 px-2.5 py-1 rounded-full shadow-sm">
-                        <div class="w-2 h-2 {{ $product->unlimited_stock ? 'bg-green-500' : ($product->stock > 0 ? 'bg-yellow-500' : 'bg-red-500') }} rounded-full"></div>
-                        <span class="text-xs font-bold text-gray-700">
-                            {{ $product->unlimited_stock ? '∞' : $product->stock ?? 0 }}
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Content -->
-                <div class="p-4 flex-1 flex flex-col gap-3">
-                    <!-- Product Name -->
-                    <div>
-                        <h4 class="font-black text-gray-900 text-base group-hover:text-blue-600 transition-colors line-clamp-2 product-name">
+                    <!-- Product Info -->
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-gray-900 text-base group-hover:text-blue-600 transition-colors truncate product-name">
                             {{ $product->name }}
                         </h4>
-                        <p class="text-xs text-gray-500 mt-2 font-mono font-bold product-sku">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</p>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-
-                    <!-- Price -->
-                    <div class="space-y-1">
-                        <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Harga Utama</p>
-                        <p class="font-black text-lg text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                        <div class="flex items-center gap-3 mt-1.5">
+                            <span class="text-xs font-mono font-bold text-gray-500 product-sku">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</span>
+                            <span class="text-xs font-bold {{ $categoryBg }} px-2.5 py-1 rounded-full">
+                                {{ $categoryLabel }}
+                            </span>
+                            @if($product->unlimited_stock)
+                                <span class="text-xs font-bold text-green-600 flex items-center gap-1">
+                                    <i class="fas fa-infinity"></i> Unlimited
+                                </span>
+                            @else
+                                <span class="text-xs font-bold {{ $product->stock > 0 ? 'text-gray-700' : 'text-red-600' }}">
+                                    {{ $product->stock ?? 0 }} Unit
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
-                <!-- Actions -->
-                <div class="bg-gray-50 border-t border-gray-100 p-3 grid grid-cols-2 gap-2">
+                <!-- Middle: Price -->
+                <div class="flex-shrink-0 mx-6 text-right">
+                    <p class="text-xs text-gray-500 font-medium">Harga</p>
+                    <p class="font-black text-lg text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex-shrink-0 flex gap-2">
                     <a href="{{ route('admin.products.edit', $product->id) }}" 
-                       class="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all font-bold text-xs shadow-sm active:scale-95">
-                        <i class="fas fa-edit"></i>
-                        <span>Edit</span>
+                       class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                       title="Edit Produk">
+                        <i class="fas fa-edit text-sm"></i>
                     </a>
                     <button type="button" 
-                       class="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all font-bold text-xs shadow-sm active:scale-95" 
+                       class="w-10 h-10 flex items-center justify-center rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm" 
                        onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')"
                        title="Hapus Produk">
-                        <i class="fas fa-trash"></i>
-                        <span>Hapus</span>
+                        <i class="fas fa-trash text-sm"></i>
                     </button>
                 </div>
-            </div>
         @empty
-            <div class="col-span-full bg-white rounded-2xl border-2 border-dashed border-gray-200 py-20 text-center">
+            <div class="bg-white rounded-2xl border-2 border-dashed border-gray-200 py-20 text-center">
                 <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
                     <i class="fas fa-box-open text-4xl"></i>
                 </div>
@@ -164,7 +160,7 @@
 </div>
 
 <script>
-// Infinite Scroll Logic
+// Infinite Scroll Logic with Full Search
 const itemsPerLoad = 10;
 let itemsShown = itemsPerLoad;
 const productSearchInput = document.getElementById('productSearch');
@@ -174,25 +170,32 @@ const scrollTrigger = document.getElementById('scrollTrigger');
 let selectedCategory = 'all';
 let isLoading = false;
 
+// Store all products data
+const allProductsData = @json($products->map(fn($p) => [
+    'id' => $p->id,
+    'name' => strtolower($p->name),
+    'sku' => str_pad($p->id, 4, '0', STR_PAD_LEFT),
+    'category' => in_array(strtolower($p->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($p->category), ['goods', 'barang']) ? 'barang' : strtolower($p->category))
+]));
+
+// Hasil filter dari search
+let filteredProductIds = allProductsData.map(p => p.id);
+
 function updateVisibility() {
     const allRows = document.querySelectorAll('.product-row');
-    let visibleIndex = 0;
     let visibleCount = 0;
-    let totalVisible = 0;
-
-    // Hitung total yang sesuai filter
-    allRows.forEach(row => {
-        if (row.dataset.display !== 'hidden') {
-            totalVisible++;
-        }
-    });
+    const totalVisible = filteredProductIds.length;
 
     // Update visibility berdasarkan itemsShown
     allRows.forEach(row => {
-        if (row.dataset.display === 'hidden') {
+        const productId = parseInt(row.dataset.productId || '0');
+        const isInFilteredResults = filteredProductIds.includes(productId);
+        
+        if (!isInFilteredResults) {
             row.style.display = 'none';
         } else {
-            visibleIndex++;
+            // Hitung index di filtered results
+            const visibleIndex = filteredProductIds.indexOf(productId) + 1;
             if (visibleIndex <= itemsShown) {
                 row.style.display = 'flex';
                 visibleCount++;
@@ -203,10 +206,14 @@ function updateVisibility() {
     });
 
     // Update product count
-    productCount.textContent = `Menampilkan ${visibleCount} dari ${totalVisible} produk`;
+    if (totalVisible === 0) {
+        productCount.textContent = 'Tidak ada produk yang sesuai';
+    } else {
+        productCount.textContent = `Menampilkan ${visibleCount} dari ${totalVisible} produk`;
+    }
 
     // Sembunyikan scroll trigger jika sudah semua
-    if (visibleCount >= totalVisible) {
+    if (visibleCount >= totalVisible || totalVisible === 0) {
         scrollTrigger.style.display = 'none';
     } else {
         scrollTrigger.style.display = 'block';
@@ -217,21 +224,22 @@ function filterProducts() {
     const searchTerm = productSearchInput?.value.toLowerCase() || '';
     itemsShown = itemsPerLoad; // Reset ke 10 setiap kali search
 
-    document.querySelectorAll('.product-row').forEach(row => {
-        const name = row.dataset.name || '';
-        const sku = row.dataset.sku || '';
-        const category = row.dataset.category || '';
-
-        const matchesSearch = !searchTerm || name.includes(searchTerm) || sku.toLowerCase().includes(searchTerm) || category.includes(searchTerm);
-        const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
-
-        // Mark as hidden or not
-        if (matchesSearch && matchesCategory) {
-            row.dataset.display = 'visible';
-        } else {
-            row.dataset.display = 'hidden';
-        }
-    });
+    // Filter dengan data, bukan DOM
+    if (!searchTerm) {
+        // Jika kosong, tampilkan semua sesuai kategori
+        filteredProductIds = allProductsData
+            .filter(p => selectedCategory === 'all' || p.category === selectedCategory)
+            .map(p => p.id);
+    } else {
+        // Search di semua produk data
+        filteredProductIds = allProductsData
+            .filter(p => {
+                const matchesSearch = p.name.includes(searchTerm) || p.sku.toLowerCase().includes(searchTerm) || p.category.includes(searchTerm);
+                const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+                return matchesSearch && matchesCategory;
+            })
+            .map(p => p.id);
+    }
 
     updateVisibility();
 }

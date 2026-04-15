@@ -47,147 +47,156 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-4">
-        <div id="productListContainer" class="space-y-4">
-            @forelse($products as $product)
-                <div class="product-row bg-white flex flex-col md:flex-row md:items-center justify-between p-5 border border-gray-100 rounded-2xl hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group relative overflow-hidden"
-                    data-category="{{ in_array(strtolower($product->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($product->category), ['goods', 'barang']) ? 'barang' : strtolower($product->category)) }}">
+    <div id="productListContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        @forelse($products as $product)
+            <div class="product-row bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group relative flex flex-col h-full"
+                data-category="{{ in_array(strtolower($product->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($product->category), ['goods', 'barang']) ? 'barang' : strtolower($product->category)) }}">
+                
+                <!-- Header dengan Icon -->
+                <div class="bg-gradient-to-br from-blue-50 to-gray-50 p-4 flex items-center justify-between border-b border-gray-100">
+                    <div class="relative">
+                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fas fa-box text-lg"></i>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
+                    </div>
                     
-                    <div class="flex items-center gap-5 flex-1">
-                        <div class="relative">
-                            <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
-                                <i class="fas fa-box text-xl"></i>
-                            </div>
-                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
-                        </div>
+                    @php
+                        $categoryBadgeClass = 'bg-gray-100 text-gray-600';
+                        $categoryLabel = 'Other';
                         
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors">{{ $product->name }}</h4>
-                            <div class="flex items-center gap-3 mt-1">
-                                <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded uppercase tracking-tight">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</span>
-                                <span class="text-gray-300">•</span>
-                                
-                                @php
-                                    $categoryBadgeClass = 'text-gray-500';
-                                    $categoryLabel = 'Other';
-                                    
-                                    if (in_array(strtolower($product->category), ['print', 'cetak'])) {
-                                        $categoryBadgeClass = 'text-blue-600';
-                                        $categoryLabel = 'Cetak';
-                                    } elseif (strtolower($product->category) === 'studio') {
-                                        $categoryBadgeClass = 'text-purple-600';
-                                        $categoryLabel = 'Studio';
-                                    } elseif (in_array(strtolower($product->category), ['goods', 'barang'])) {
-                                        $categoryBadgeClass = 'text-orange-600';
-                                        $categoryLabel = 'Barang';
-                                    }
-                                @endphp
-                                <span class="text-xs font-bold {{ $categoryBadgeClass }} uppercase italic">{{ $categoryLabel }}</span>
-                            </div>
-                        </div>
+                        if (in_array(strtolower($product->category), ['print', 'cetak'])) {
+                            $categoryBadgeClass = 'bg-blue-100 text-blue-700';
+                            $categoryLabel = 'Cetak';
+                        } elseif (strtolower($product->category) === 'studio') {
+                            $categoryBadgeClass = 'bg-purple-100 text-purple-700';
+                            $categoryLabel = 'Studio';
+                        } elseif (in_array(strtolower($product->category), ['goods', 'barang'])) {
+                            $categoryBadgeClass = 'bg-orange-100 text-orange-700';
+                            $categoryLabel = 'Barang';
+                        }
+                    @endphp
+                    <span class="text-xs font-bold {{ $categoryBadgeClass }} px-2.5 py-1 rounded-lg">{{ $categoryLabel }}</span>
+                </div>
+
+                <!-- Content -->
+                <div class="p-4 flex-1 flex flex-col gap-3">
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm group-hover:text-blue-600 transition-colors line-clamp-2">
+                            {{ $product->name }}
+                        </h4>
+                        <p class="text-xs text-gray-500 mt-1 font-medium">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</p>
                     </div>
 
-                    <div class="flex flex-row md:flex-col lg:flex-row items-center gap-8 my-4 md:my-0 px-0 md:px-8 border-t md:border-t-0 md:border-x border-gray-50 pt-4 md:pt-0">
-                        <div class="text-left md:text-right lg:min-w-[150px]">
-                            <p class="text-sm text-gray-400 font-medium">Harga Utama</p>
-                            <p class="text-xl font-black text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                        </div>
-                        
-                        <div class="lg:min-w-[120px]">
-                            <p class="text-sm text-gray-400 font-medium">Status Stok</p>
+                    <!-- Price -->
+                    <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                        <p class="text-xs text-gray-600 font-medium mb-0.5">Harga Utama</p>
+                        <p class="font-black text-blue-600 text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-warehouse text-xs text-gray-400"></i>
+                        <div class="text-xs">
+                            <p class="text-gray-600 font-medium">Status Stok</p>
                             @if($product->unlimited_stock)
-                                <span class="inline-flex items-center gap-1.5 text-green-600 font-bold text-sm">
+                                <span class="inline-flex items-center gap-1 text-green-600 font-bold">
                                     <i class="fas fa-infinity text-xs"></i> Unlimited
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 {{ $product->stock <= 5 ? 'text-red-500' : 'text-gray-700' }} font-bold text-sm">
-                                    <i class="fas fa-warehouse text-xs"></i> {{ $product->stock ?? 0 }} Unit
-                                </span>
+                                <span class="text-gray-700 font-bold">{{ $product->stock ?? 0 }} Unit</span>
                             @endif
                         </div>
                     </div>
-
-                    <div class="flex items-center justify-end gap-2 pl-0 md:pl-6">
-                        <a href="{{ route('admin.products.edit', $product->id) }}" 
-                           class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                           title="Edit Produk">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button type="button" 
-                           class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 hover:bg-red-600 hover:text-white transition-all shadow-sm" 
-                           onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')"
-                           title="Hapus Produk">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-
-                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                 </div>
-            @empty
-                <div class="bg-white rounded-2xl border-2 border-dashed border-gray-200 py-20 text-center">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
-                        <i class="fas fa-box-open text-4xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Produk Tidak Ditemukan</h3>
-                    <p class="text-gray-500 mb-8 max-w-xs mx-auto">Mungkin kamu bisa mencoba kata kunci lain atau kategori yang berbeda.</p>
-                    <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-all">
-                        <i class="fas fa-plus"></i> Buat Produk Baru
+
+                <!-- Actions -->
+                <div class="bg-gray-50 border-t border-gray-100 p-3 flex gap-2 justify-end">
+                    <a href="{{ route('admin.products.edit', $product->id) }}" 
+                       class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all font-medium text-sm shadow-sm active:scale-95"
+                       title="Edit Produk">
+                        <i class="fas fa-edit text-xs"></i>
+                        <span class="hidden sm:inline">Edit</span>
                     </a>
+                    <button type="button" 
+                       class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all font-medium text-sm shadow-sm active:scale-95" 
+                       onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')"
+                       title="Hapus Produk">
+                        <i class="fas fa-trash text-xs"></i>
+                        <span class="hidden sm:inline">Hapus</span>
+                    </button>
                 </div>
-            @endforelse
-        </div>
+
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+            </div>
+        @empty
+            <div class="col-span-full bg-white rounded-2xl border-2 border-dashed border-gray-200 py-20 text-center">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+                    <i class="fas fa-box-open text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Produk Tidak Ditemukan</h3>
+                <p class="text-gray-500 mb-8 max-w-xs mx-auto">Mungkin kamu bisa mencoba kata kunci lain atau kategori yang berbeda.</p>
+                <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-all">
+                    <i class="fas fa-plus"></i> Buat Produk Baru
+                </a>
+            </div>
+        @endforelse
     </div>
 
-    @if($products->hasPages())
-        <div class="mt-10 flex justify-center">
-            <nav class="inline-flex items-center p-1 bg-white rounded-2xl shadow-sm border border-gray-100 gap-1">
-                {{-- Previous --}}
-                @if ($products->onFirstPage())
-                    <span class="w-10 h-10 flex items-center justify-center text-gray-300">
-                        <i class="fas fa-chevron-left"></i>
-                    </span>
-                @else
-                    <a href="{{ $products->previousPageUrl() }}" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
-                        <i class="fas fa-chevron-left"></i>
-                    </a>
-                @endif
-
-                {{-- Pages --}}
-                @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-                    @if ($page == $products->currentPage())
-                        <span class="w-10 h-10 flex items-center justify-center bg-blue-600 text-white font-bold rounded-xl shadow-md shadow-blue-500/20">
-                            {{ $page }}
-                        </span>
-                    @else
-                        <a href="{{ $url }}" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
-                            {{ $page }}
-                        </a>
-                    @endif
-                @endforeach
-
-                {{-- Next --}}
-                @if ($products->hasMorePages())
-                    <a href="{{ $products->nextPageUrl() }}" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                @else
-                    <span class="w-10 h-10 flex items-center justify-center text-gray-300">
-                        <i class="fas fa-chevron-right"></i>
-                    </span>
-                @endif
-            </nav>
-        </div>
-    @endif
+    <div id="loadMoreContainer" class="mt-8 flex flex-col items-center gap-4">
+        <p id="productCount" class="text-sm text-gray-600 font-medium"></p>
+        <button id="loadMoreBtn" type="button" 
+            class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-8 py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20">
+            <i class="fas fa-arrow-down text-lg"></i> 
+            <span>Tampilkan 10 Lebih Banyak</span>
+        </button>
+    </div>
 </div>
 
 <script>
-// Fungsi Filter & Search (Logika asli tetap dipertahankan)
+// Expand/Load More Logic
+const itemsPerLoad = 10;
+let itemsShown = itemsPerLoad;
 const productSearchInput = document.getElementById('productSearch');
 const categoryTabs = document.querySelectorAll('.category-tab');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const productCount = document.getElementById('productCount');
 let selectedCategory = 'all';
+
+function updateVisibility() {
+    const allRows = document.querySelectorAll('.product-row');
+    let visibleIndex = 0;
+    let visibleCount = 0;
+
+    allRows.forEach((row, index) => {
+        const isHidden = row.style.display === 'none';
+        
+        if (!isHidden) {
+            visibleIndex++;
+            if (visibleIndex <= itemsShown) {
+                row.style.display = 'flex';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    });
+
+    // Update product count
+    const totalVisible = Array.from(allRows).filter(row => row.dataset.display !== 'hidden').length;
+    productCount.textContent = `Menampilkan ${Math.min(visibleCount, totalVisible)} dari ${totalVisible} produk`;
+
+    // Hide button jika sudah menampilkan semua
+    if (visibleCount >= totalVisible) {
+        loadMoreBtn.style.display = 'none';
+    } else {
+        loadMoreBtn.style.display = 'flex';
+    }
+}
 
 function filterProducts() {
     const searchTerm = productSearchInput?.value.toLowerCase() || '';
+    itemsShown = itemsPerLoad; // Reset ke 10 setiap kali search
 
     document.querySelectorAll('.product-row').forEach(row => {
         const name = row.querySelector('h4')?.textContent.toLowerCase() || '';
@@ -197,8 +206,16 @@ function filterProducts() {
         const matchesSearch = name.includes(searchTerm) || sku.includes(searchTerm) || category.includes(searchTerm);
         const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
 
-        row.style.display = matchesSearch && matchesCategory ? 'flex' : 'none';
+        // Mark as hidden or not
+        if (matchesSearch && matchesCategory) {
+            row.dataset.display = 'visible';
+        } else {
+            row.dataset.display = 'hidden';
+            row.style.display = 'none';
+        }
     });
+
+    updateVisibility();
 }
 
 productSearchInput?.addEventListener('input', filterProducts);
@@ -206,6 +223,7 @@ productSearchInput?.addEventListener('input', filterProducts);
 categoryTabs.forEach(tab => {
     tab.addEventListener('click', function() {
         selectedCategory = this.dataset.category;
+        itemsShown = itemsPerLoad; // Reset ke 10 setiap kali filter
 
         // Styling tab
         categoryTabs.forEach(t => {
@@ -218,6 +236,12 @@ categoryTabs.forEach(tab => {
 
         filterProducts();
     });
+});
+
+// Load More button
+loadMoreBtn?.addEventListener('click', function() {
+    itemsShown += itemsPerLoad;
+    updateVisibility();
 });
 
 filterProducts();

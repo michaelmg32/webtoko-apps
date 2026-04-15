@@ -111,8 +111,16 @@
                             <td class="px-6 py-4">
                                 @php
                                     $paymentStatus = $order->payment_status ?? 'unpaid';
-                                    $paymentBadge = $paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
-                                    $paymentLabel = $paymentStatus === 'paid' ? 'Sudah Dibayar' : 'Belum Dibayar';
+                                    $paymentBadge = match($paymentStatus) {
+                                        'paid' => 'bg-green-100 text-green-700',
+                                        'partial' => 'bg-amber-100 text-amber-700',
+                                        default => 'bg-red-100 text-red-700'
+                                    };
+                                    $paymentLabel = match($paymentStatus) {
+                                        'paid' => 'Sudah Dibayar',
+                                        'partial' => 'Bayar Setengah (DP)',
+                                        default => 'Belum Dibayar'
+                                    };
                                 @endphp
                                 <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase {{ $paymentBadge }}">
                                     {{ $paymentLabel }}

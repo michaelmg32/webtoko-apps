@@ -180,6 +180,55 @@
                 </div>
             @endif
         </div>
+
+        <!-- Pagination Links -->
+        @if($orders->count() > 0 && $orders->hasPages())
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
+                <div class="flex items-center justify-center gap-1">
+                    {{-- Previous Page Link --}}
+                    @if ($orders->onFirstPage())
+                        <button disabled class="px-3 py-2 rounded-lg text-slate-400 bg-slate-200 cursor-not-allowed">
+                            <i class="fas fa-chevron-left text-sm"></i>
+                        </button>
+                    @else
+                        <a href="{{ $orders->previousPageUrl() }}&period={{ request('period', '7') }}" 
+                           class="px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition font-bold">
+                            <i class="fas fa-chevron-left text-sm"></i>
+                        </a>
+                    @endif
+
+                    {{-- Page Numbers --}}
+                    @foreach ($orders->getUrlRange(1, $orders->lastPage()) as $page => $url)
+                        @if ($page == $orders->currentPage())
+                            <button disabled class="px-4 py-2 rounded-lg bg-blue-600 text-white font-bold text-sm cursor-default">
+                                {{ $page }}
+                            </button>
+                        @else
+                            <a href="{{ $url }}&period={{ request('period', '7') }}" 
+                               class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-bold text-sm">
+                                {{ $page }}
+                            </a>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($orders->hasMorePages())
+                        <a href="{{ $orders->nextPageUrl() }}&period={{ request('period', '7') }}" 
+                           class="px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition font-bold">
+                            <i class="fas fa-chevron-right text-sm"></i>
+                        </a>
+                    @else
+                        <button disabled class="px-3 py-2 rounded-lg text-slate-400 bg-slate-200 cursor-not-allowed">
+                            <i class="fas fa-chevron-right text-sm"></i>
+                        </button>
+                    @endif
+                </div>
+                <p class="text-center text-xs text-slate-500 mt-3 font-medium">
+                    Halaman {{ $orders->currentPage() }} dari {{ $orders->lastPage() }} 
+                    (Total {{ $orders->total() }} pesanan)
+                </p>
+            </div>
+        @endif
     </div>
 </div>
 

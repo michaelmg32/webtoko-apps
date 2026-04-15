@@ -181,14 +181,13 @@
             @endif
         </div>
 
-        <!-- Infinite Scroll Trigger -->
-        <div id="scrollTrigger" class="mt-8 flex justify-center py-6">
-            <div class="text-center">
-                <div class="inline-flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-600 rounded-full animate-bounce"></div>
-                    <p class="text-sm text-slate-500 font-medium">Scroll untuk muat lebih banyak...</p>
-                </div>
-            </div>
+        <!-- Expand Button -->
+        <div id="expandContainer" class="mt-8 flex justify-center pb-6">
+            <button id="expandBtn" type="button" 
+                class="inline-flex items-center gap-2 px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-lg active:scale-95">
+                <i class="fas fa-chevron-down"></i>
+                <span>Muat Lebih Banyak</span>
+            </button>
         </div>
     </div>
 </div>
@@ -328,9 +327,9 @@
 </div>
 
 <script>
-    // --- INFINITE SCROLL + FILTER LOGIC ---
+    // --- EXPAND BUTTON + FILTER LOGIC ---
     let itemsShown = 15; // Start with 15 items
-    const itemsPerLoad = 15; // Load 15 more on each scroll
+    const itemsPerLoad = 15; // Load 15 more on each click
     let currentOrderId = null;
     let allOrders = @json($orders);
     let isLoading = false;
@@ -345,24 +344,12 @@
     
     filterTable();
 
-    // Infinite Scroll Setup
-    const scrollTrigger = document.getElementById('scrollTrigger');
-    const observerOptions = {
-        root: null,
-        rootMargin: '100px',
-        threshold: 0.1
-    };
+    // Expand Button Setup
+    const expandBtn = document.getElementById('expandBtn');
+    const expandContainer = document.getElementById('expandContainer');
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !isLoading) {
-                loadMoreOrders();
-            }
-        });
-    }, observerOptions);
-
-    if (scrollTrigger) {
-        observer.observe(scrollTrigger);
+    if (expandBtn) {
+        expandBtn.addEventListener('click', loadMoreOrders);
     }
 
     function updateOrderVisibility() {
@@ -382,7 +369,7 @@
             }
         });
 
-        // Hide scroll trigger if all visible
+        // Hide expand button if all visible
         const totalFilteredVisible = Array.from(allRows).filter(r => {
             const text = (r.dataset.customerName || '').toLowerCase() + (r.dataset.orderCode || '').toLowerCase();
             const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
@@ -393,19 +380,23 @@
         }).length;
 
         if (visibleCount >= totalFilteredVisible) {
-            scrollTrigger.style.display = 'none';
+            expandContainer.style.display = 'none';
         } else {
-            scrollTrigger.style.display = 'block';
+            expandContainer.style.display = 'flex';
         }
     }
 
     function loadMoreOrders() {
         if (isLoading) return;
         isLoading = true;
+        expandBtn.disabled = true;
+        expandBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div><span>Memuat...</span>';
         
         setTimeout(() => {
             itemsShown += itemsPerLoad;
             updateOrderVisibility();
+            expandBtn.disabled = false;
+            expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i><span>Muat Lebih Banyak</span>';
             isLoading = false;
         }, 300);
     }

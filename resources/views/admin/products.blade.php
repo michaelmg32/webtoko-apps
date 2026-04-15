@@ -165,9 +165,9 @@
 </div>
 
 @php
-// Prepare products data for JavaScript
+// Prepare ALL products data for JavaScript (untuk search di semua produk, bukan hanya yang di-paginate)
 $productsData = [];
-foreach($products as $p) {
+foreach($allProducts as $p) {
     $cat = in_array(strtolower($p->category), ['print', 'cetak']) ? 'cetak' : 
            (in_array(strtolower($p->category), ['goods', 'barang']) ? 'barang' : strtolower($p->category));
     $productsData[] = [

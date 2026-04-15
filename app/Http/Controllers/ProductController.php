@@ -10,8 +10,11 @@ class ProductController extends Controller
 {
     public function index()
     {
-        // Get products with pagination
-        $products = Product::latest()->paginate(5);
+        // Get products with pagination for display
+        $products = Product::latest()->paginate(15);
+
+        // Get ALL products without pagination for JavaScript search
+        $allProducts = Product::latest()->get();
 
         // Calculate statistics
         // Low stock count for limited-stock products
@@ -44,6 +47,7 @@ class ProductController extends Controller
 
         return view('admin.products', [
             'products' => $products,
+            'allProducts' => $allProducts,
             'lowStockCount' => $lowStockCount,
             'mostPurchasedCategory' => $mostPurchasedCategoryLabel,
             'totalItems' => $totalItems

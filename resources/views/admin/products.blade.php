@@ -159,6 +159,21 @@
     </div>
 </div>
 
+@php
+// Prepare products data for JavaScript
+$productsData = [];
+foreach($products as $p) {
+    $cat = in_array(strtolower($p->category), ['print', 'cetak']) ? 'cetak' : 
+           (in_array(strtolower($p->category), ['goods', 'barang']) ? 'barang' : strtolower($p->category));
+    $productsData[] = [
+        'id' => $p->id,
+        'name' => strtolower($p->name),
+        'sku' => str_pad($p->id, 4, '0', STR_PAD_LEFT),
+        'category' => $cat
+    ];
+}
+@endphp
+
 <script>
 // Infinite Scroll Logic with Full Search
 const itemsPerLoad = 10;
@@ -171,12 +186,7 @@ let selectedCategory = 'all';
 let isLoading = false;
 
 // Store all products data
-const allProductsData = @json($products->map(fn($p) => [
-    'id' => $p->id,
-    'name' => strtolower($p->name),
-    'sku' => str_pad($p->id, 4, '0', STR_PAD_LEFT),
-    'category' => in_array(strtolower($p->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($p->category), ['goods', 'barang']) ? 'barang' : strtolower($p->category))
-]));
+const allProductsData = @json($productsData);
 
 // Hasil filter dari search
 let filteredProductIds = allProductsData.map(p => p.id);

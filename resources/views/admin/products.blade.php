@@ -148,14 +148,13 @@
         @endforelse
     </div>
 
-    <!-- Infinite Scroll Trigger -->
-    <div id="scrollTrigger" class="mt-12 flex justify-center">
-        <div class="text-center py-8">
-            <div class="inline-flex items-center gap-2">
-                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                <p class="text-sm text-gray-500">Scroll untuk muat lebih banyak...</p>
-            </div>
-        </div>
+    <!-- Load More Button -->
+    <div id="loadMoreContainer" class="mt-12 flex justify-center">
+        <button id="loadMoreBtn" type="button" 
+            class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg active:scale-95">
+            <i class="fas fa-chevron-down"></i>
+            <span>Muat Lebih Banyak</span>
+        </button>
     </div>
 
     <!-- Product Count -->
@@ -181,12 +180,13 @@ foreach($allProducts as $p) {
 
 <script>
 // Infinite Scroll Logic with Full Search
-const itemsPerLoad = 10;
+const itemsPerLoad = 15;
 let itemsShown = itemsPerLoad;
 const productSearchInput = document.getElementById('productSearch');
 const categoryTabs = document.querySelectorAll('.category-tab');
 const productCount = document.getElementById('productCount');
-const scrollTrigger = document.getElementById('scrollTrigger');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const loadMoreContainer = document.getElementById('loadMoreContainer');
 let selectedCategory = 'all';
 let isLoading = false;
 
@@ -227,17 +227,17 @@ function updateVisibility() {
         productCount.textContent = `Menampilkan ${visibleCount} dari ${totalVisible} produk`;
     }
 
-    // Sembunyikan scroll trigger jika sudah semua
+    // Sembunyikan tombol Load More jika sudah semua
     if (visibleCount >= totalVisible || totalVisible === 0) {
-        scrollTrigger.style.display = 'none';
+        loadMoreContainer.style.display = 'none';
     } else {
-        scrollTrigger.style.display = 'block';
+        loadMoreContainer.style.display = 'flex';
     }
 }
 
 function filterProducts() {
     const searchTerm = productSearchInput?.value.toLowerCase() || '';
-    itemsShown = itemsPerLoad; // Reset ke 10 setiap kali search
+    itemsShown = itemsPerLoad; // Reset ke 15 setiap kali search
 
     // Filter dengan data, bukan DOM
     if (!searchTerm) {
@@ -271,25 +271,8 @@ function loadMoreItems() {
     }, 300);
 }
 
-// Setup Intersection Observer untuk infinite scroll
-const observerOptions = {
-    root: null,
-    rootMargin: '100px',
-    threshold: 0.1
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && !isLoading) {
-            loadMoreItems();
-        }
-    });
-}, observerOptions);
-
-// Observe scroll trigger element
-if (scrollTrigger) {
-    observer.observe(scrollTrigger);
-}
+// Event listener untuk tombol Load More
+loadMoreBtn?.addEventListener('click', loadMoreItems);
 
 productSearchInput?.addEventListener('input', filterProducts);
 

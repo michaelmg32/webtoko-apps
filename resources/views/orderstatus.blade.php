@@ -354,35 +354,37 @@
 
     function updateOrderVisibility() {
         const allRows = document.querySelectorAll('.order-row');
-        let visibleCount = 0;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
         
-        allRows.forEach((row, index) => {
-            // Get visible rows after filtering
-            if (row.style.display !== 'none') {
-                visibleCount++;
-                // Show/hide based on itemsShown
-                if (visibleCount <= itemsShown) {
+        let visibleCount = 0;
+        let totalMatching = 0;
+        
+        // Count and display rows based on filter + itemsShown
+        allRows.forEach((row) => {
+            const text = (row.dataset.customerName || '').toLowerCase() + (row.dataset.orderCode || '').toLowerCase();
+            const isTaken = row.dataset.status === 'taken';
+            const matchesSearch = text.includes(search);
+            const isMatching = matchesSearch && (!hideTaken || !isTaken);
+            
+            if (isMatching) {
+                totalMatching++;
+                if (totalMatching <= itemsShown) {
                     row.style.display = '';
+                    visibleCount++;
                 } else {
                     row.style.display = 'none';
                 }
+            } else {
+                row.style.display = 'none';
             }
         });
 
-        // Hide expand button if all visible
-        const totalFilteredVisible = Array.from(allRows).filter(r => {
-            const text = (r.dataset.customerName || '').toLowerCase() + (r.dataset.orderCode || '').toLowerCase();
-            const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
-            const isTaken = r.dataset.status === 'taken';
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const matchesSearch = text.includes(search);
-            return matchesSearch && (!hideTaken || !isTaken);
-        }).length;
-
-        if (visibleCount >= totalFilteredVisible) {
-            expandContainer.style.display = 'none';
-        } else {
+        // Show/hide expand button
+        if (totalMatching > itemsShown) {
             expandContainer.style.display = 'flex';
+        } else {
+            expandContainer.style.display = 'none';
         }
     }
 

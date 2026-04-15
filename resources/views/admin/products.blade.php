@@ -171,11 +171,20 @@ function updateVisibility() {
     const allRows = document.querySelectorAll('.product-row');
     let visibleIndex = 0;
     let visibleCount = 0;
+    let totalVisible = 0;
 
-    allRows.forEach((row, index) => {
-        const isHidden = row.style.display === 'none';
-        
-        if (!isHidden) {
+    // Hitung total yang sesuai filter
+    allRows.forEach(row => {
+        if (row.dataset.display !== 'hidden') {
+            totalVisible++;
+        }
+    });
+
+    // Update visibility berdasarkan itemsShown
+    allRows.forEach(row => {
+        if (row.dataset.display === 'hidden') {
+            row.style.display = 'none';
+        } else {
             visibleIndex++;
             if (visibleIndex <= itemsShown) {
                 row.style.display = 'flex';
@@ -187,10 +196,9 @@ function updateVisibility() {
     });
 
     // Update product count
-    const totalVisible = Array.from(allRows).filter(row => row.dataset.display !== 'hidden').length;
-    productCount.textContent = `Menampilkan ${Math.min(visibleCount, totalVisible)} dari ${totalVisible} produk`;
+    productCount.textContent = `Menampilkan ${visibleCount} dari ${totalVisible} produk`;
 
-    // Hide button jika sudah menampilkan semua
+    // Show/Hide button
     if (visibleCount >= totalVisible) {
         loadMoreBtn.style.display = 'none';
     } else {

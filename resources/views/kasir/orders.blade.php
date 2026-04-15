@@ -965,13 +965,23 @@ function renderPaymentForm(type) {
         document.getElementById('paymentMethod').value = '';
         validatePaymentAmount();
     } else if (type === 'dp') {
+        // Calculate max DP: less than total price, not equal to it
+        const totalPrice = parseInt(selectedOrderData?.total_price || 0);
+        const dpAmount = parseInt(selectedOrderData?.dp_amount || 0);
+        const paymentsPaidAmount = selectedOrderData?.payments?.reduce((sum, p) => sum + parseInt(p.amount || 0), 0) || 0;
+        const totalPaid = dpAmount > 0 ? dpAmount : paymentsPaidAmount;
+        
+        // Max DP is totalPrice - 1 (so it can't equal total price)
+        const maxDPAmount = Math.max(1000, totalPrice - totalPaid - 1);
+        
         content.innerHTML = `
             <div class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-500 font-semibold block mb-2">JUMLAH DP (Rp)</label>
                     <input type="number" id="dpAmountInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
-                           placeholder="Masukkan DP" step="1000" min="1000" max="${remainingPayment}">
-                    <small class="text-gray-500">Maks: Rp ${remainingPayment.toLocaleString('id-ID')}</small>
+                           placeholder="Masukkan DP" step="1000" min="1000" max="${maxDPAmount}">
+                    <small class="text-gray-500">Maks: Rp ${maxDPAmount.toLocaleString('id-ID')} (Tidak boleh sama atau melebihi total)</small>
+                    <small id="dpValidationError" class="text-red-600 font-semibold block mt-1 hidden">Jumlah DP tidak boleh sama atau melebihi harga total!</small>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-semibold mb-2">METODE PEMBAYARAN</p>
@@ -993,8 +1003,26 @@ function renderPaymentForm(type) {
         document.getElementById('finalizeBtn').textContent = '✓ Simpan DP';
         
         // Attach events
-        document.getElementById('dpAmountInput').addEventListener('input', function() {
-            document.getElementById('paymentAmount').value = this.value;
+        const dpInput = document.getElementById('dpAmountInput');
+        const dpErrorMsg = document.getElementById('dpValidationError');
+        
+        dpInput.addEventListener('input', function() {
+            const inputValue = parseInt(this.value || 0);
+            const totalPriceValue = parseInt(selectedOrderData?.total_price || 0);
+            
+            // Check if DP equals or exceeds total price
+            if (inputValue >= totalPriceValue) {
+                dpErrorMsg.classList.remove('hidden');
+                dpInput.classList.add('border-red-500', 'bg-red-50');
+                dpInput.classList.remove('border-gray-300');
+                document.getElementById('paymentAmount').value = 0;
+            } else {
+                dpErrorMsg.classList.add('hidden');
+                dpInput.classList.remove('border-red-500', 'bg-red-50');
+                dpInput.classList.add('border-gray-300');
+                document.getElementById('paymentAmount').value = this.value;
+            }
+            
             validatePaymentAmount();
         });
         
@@ -1102,12 +1130,16 @@ function validatePaymentAmount() {
         finalizeBtn.disabled = false;
     } else if (currentPaymentType === 'dp') {
         const amount = parseInt(document.getElementById('dpAmountInput')?.value || 0);
-        const dpAmount = parseInt(selectedOrderData.dp_amount || 0);
-        const paymentsPaidAmount = selectedOrderData.payments?.reduce((sum, p) => sum + parseInt(p.amount || 0), 0) || 0;
+        const totalPrice = parseInt(selectedOrderData?.total_price || 0);
+        const dpAmount = parseInt(selectedOrderData?.dp_amount || 0);
+        const paymentsPaidAmount = selectedOrderData?.payments?.reduce((sum, p) => sum + parseInt(p.amount || 0), 0) || 0;
         const totalPaid = dpAmount > 0 ? dpAmount : paymentsPaidAmount;
         const maxAmount = parseInt(selectedOrderData.total_price) || 0;
         const maxRemaining = maxAmount - totalPaid;
-        finalizeBtn.disabled = amount <= 0 || amount > maxRemaining;
+        
+        // DP tidak boleh sama atau melebihi harga total
+        const isValidAmount = amount > 0 && amount < totalPrice && amount <= maxRemaining;
+        finalizeBtn.disabled = !isValidAmount;
     } else if (currentPaymentType === 'pelunasan') {
         const pelunasanInput = document.getElementById('pelunasanAmountInput');
         if (!pelunasanInput) {

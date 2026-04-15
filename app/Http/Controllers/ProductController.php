@@ -10,11 +10,11 @@ class ProductController extends Controller
 {
     public function index()
     {
-        // Get products with pagination for display
-        $products = Product::latest()->paginate(15);
+        // Get ALL products (tanpa pagination, karena JavaScript yang handle tampilan)
+        $products = Product::latest()->get();
 
-        // Get ALL products without pagination for JavaScript search
-        $allProducts = Product::latest()->get();
+        // Get ALL products untuk JavaScript search
+        $allProducts = $products;
 
         // Calculate statistics
         // Low stock count for limited-stock products

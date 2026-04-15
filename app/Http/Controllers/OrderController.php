@@ -150,7 +150,8 @@ class OrderController extends Controller
                 'discount_percentage' => 0, // Persentase diskon akan di-set ke 0 karena diskon dalam nominal
                 'payment_status' => 'unpaid',
                 'print_status' => $hasPrintItems ? 'pending' : 'not_needed',
-                'pickup_status' => 'waiting'
+                'pickup_status' => 'waiting',
+                'notes' => $request->notes ?? null
             ]);
 
             $total = 0;

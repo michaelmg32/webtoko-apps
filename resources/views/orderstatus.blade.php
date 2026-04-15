@@ -181,54 +181,15 @@
             @endif
         </div>
 
-        <!-- Pagination Links -->
-        @if($orders->count() > 0 && $orders->hasPages())
-            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
-                <div class="flex items-center justify-center gap-1">
-                    {{-- Previous Page Link --}}
-                    @if ($orders->onFirstPage())
-                        <button disabled class="px-3 py-2 rounded-lg text-slate-400 bg-slate-200 cursor-not-allowed">
-                            <i class="fas fa-chevron-left text-sm"></i>
-                        </button>
-                    @else
-                        <a href="{{ $orders->previousPageUrl() }}&period={{ request('period', '7') }}" 
-                           class="px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition font-bold">
-                            <i class="fas fa-chevron-left text-sm"></i>
-                        </a>
-                    @endif
-
-                    {{-- Page Numbers --}}
-                    @foreach ($orders->getUrlRange(1, $orders->lastPage()) as $page => $url)
-                        @if ($page == $orders->currentPage())
-                            <button disabled class="px-4 py-2 rounded-lg bg-blue-600 text-white font-bold text-sm cursor-default">
-                                {{ $page }}
-                            </button>
-                        @else
-                            <a href="{{ $url }}&period={{ request('period', '7') }}" 
-                               class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-bold text-sm">
-                                {{ $page }}
-                            </a>
-                        @endif
-                    @endforeach
-
-                    {{-- Next Page Link --}}
-                    @if ($orders->hasMorePages())
-                        <a href="{{ $orders->nextPageUrl() }}&period={{ request('period', '7') }}" 
-                           class="px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition font-bold">
-                            <i class="fas fa-chevron-right text-sm"></i>
-                        </a>
-                    @else
-                        <button disabled class="px-3 py-2 rounded-lg text-slate-400 bg-slate-200 cursor-not-allowed">
-                            <i class="fas fa-chevron-right text-sm"></i>
-                        </button>
-                    @endif
+        <!-- Infinite Scroll Trigger -->
+        <div id="scrollTrigger" class="mt-8 flex justify-center py-6">
+            <div class="text-center">
+                <div class="inline-flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-600 rounded-full animate-bounce"></div>
+                    <p class="text-sm text-slate-500 font-medium">Scroll untuk muat lebih banyak...</p>
                 </div>
-                <p class="text-center text-xs text-slate-500 mt-3 font-medium">
-                    Halaman {{ $orders->currentPage() }} dari {{ $orders->lastPage() }} 
-                    (Total {{ $orders->total() }} pesanan)
-                </p>
             </div>
-        @endif
+        </div>
     </div>
 </div>
 
@@ -367,9 +328,12 @@
 </div>
 
 <script>
-    // --- SEMUA LOGIKA JAVASCRIPT AWAL ANDA TETAP DI SINI ---
+    // --- INFINITE SCROLL + FILTER LOGIC ---
+    let itemsShown = 15; // Start with 15 items
+    const itemsPerLoad = 15; // Load 15 more on each scroll
     let currentOrderId = null;
     let allOrders = @json($orders);
+    let isLoading = false;
 
     // Initialize dropdown value from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
@@ -380,6 +344,71 @@
     document.getElementById('hideCompletedCheckbox').addEventListener('change', filterTable);
     
     filterTable();
+
+    // Infinite Scroll Setup
+    const scrollTrigger = document.getElementById('scrollTrigger');
+    const observerOptions = {
+        root: null,
+        rootMargin: '100px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoading) {
+                loadMoreOrders();
+            }
+        });
+    }, observerOptions);
+
+    if (scrollTrigger) {
+        observer.observe(scrollTrigger);
+    }
+
+    function updateOrderVisibility() {
+        const allRows = document.querySelectorAll('.order-row');
+        let visibleCount = 0;
+        
+        allRows.forEach((row, index) => {
+            // Get visible rows after filtering
+            if (row.style.display !== 'none') {
+                visibleCount++;
+                // Show/hide based on itemsShown
+                if (visibleCount <= itemsShown) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+
+        // Hide scroll trigger if all visible
+        const totalFilteredVisible = Array.from(allRows).filter(r => {
+            const text = (r.dataset.customerName || '').toLowerCase() + (r.dataset.orderCode || '').toLowerCase();
+            const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
+            const isTaken = r.dataset.status === 'taken';
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const matchesSearch = text.includes(search);
+            return matchesSearch && (!hideTaken || !isTaken);
+        }).length;
+
+        if (visibleCount >= totalFilteredVisible) {
+            scrollTrigger.style.display = 'none';
+        } else {
+            scrollTrigger.style.display = 'block';
+        }
+    }
+
+    function loadMoreOrders() {
+        if (isLoading) return;
+        isLoading = true;
+        
+        setTimeout(() => {
+            itemsShown += itemsPerLoad;
+            updateOrderVisibility();
+            isLoading = false;
+        }, 300);
+    }
 
     document.addEventListener('click', function(e) {
         if (e.target.closest('.view-detail-btn')) {
@@ -452,7 +481,6 @@
         document.getElementById('detailModal').classList.remove('hidden');
     }
 
-    // Fungsi Void, Receipt, dan Filter Lainnya (Tetap Sama Seperti Kode Awal Anda)
     function voidOrder() {
         const userRole = '{{ auth()->user()->role ?? null }}';
         if (userRole !== 'admin') { showNotification('Hanya admin yang bisa void order', 'warning'); return; }
@@ -483,11 +511,14 @@
         const search = document.getElementById('searchInput').value.toLowerCase();
         const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
         document.querySelectorAll('.order-row').forEach(row => {
-            const text = row.dataset.customerName.toLowerCase() + row.dataset.orderCode.toLowerCase();
+            const text = (row.dataset.customerName || '').toLowerCase() + (row.dataset.orderCode || '').toLowerCase();
             const isTaken = row.dataset.status === 'taken';
             const matchesSearch = text.includes(search);
             row.style.display = matchesSearch && (!hideTaken || !isTaken) ? '' : 'none';
         });
+        
+        itemsShown = 15; // Reset to 15 when filtering
+        updateOrderVisibility();
     }
 
     function updateStatus() {
@@ -498,7 +529,6 @@
             return;
         }
 
-        // Send AJAX request to update status
         fetch(`/orders/${currentOrderId}/update-pickup-status`, {
             method: 'POST',
             headers: {
@@ -512,7 +542,6 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update the row's status badge and data
                 const row = document.querySelector(`[data-order-id="${currentOrderId}"]`);
                 if (row) {
                     row.dataset.status = selectedStatus;
@@ -529,7 +558,6 @@
                 closeModal();
                 showNotification('Status berhasil diperbarui!', 'success');
                 
-                // Optional: Refresh page or update statistics
                 setTimeout(() => location.reload(), 1000);
             } else {
                 showNotification('Gagal perbarui status: ' + (data.message || 'Error tidak diketahui'), 'error');
@@ -543,14 +571,10 @@
 
     function closeReceiptModal() { document.getElementById('receiptModal').classList.add('hidden'); }
 
-    // Time period filter functionality
     function applyTimePeriodFilter() {
         const timePeriod = document.getElementById('timePeriod').value;
-        
-        // Create new URL with parameters
         const url = new URL(window.location);
         url.searchParams.set('period', timePeriod);
-        
         window.location = url.toString();
     }
 </script>

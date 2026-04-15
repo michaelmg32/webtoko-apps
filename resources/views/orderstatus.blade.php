@@ -250,9 +250,9 @@
                 </div>
             </div>
 
-            <div id="notesSection" class="hidden">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Catatan Internal</p>
-                <p id="detailNotes" class="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl italic border border-slate-100">-</p>
+            <div id="notesSection" class="hidden p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">📝 Catatan Pesanan</p>
+                <p id="detailNotes" class="text-sm text-blue-800 italic whitespace-pre-wrap break-words">-</p>
             </div>
         </div>
 
@@ -484,6 +484,16 @@
                 </div>
             `;
         }).join('');
+
+        // Handle Notes Display
+        const notesSection = document.getElementById('notesSection');
+        const detailNotes = document.getElementById('detailNotes');
+        if (order.notes && order.notes.trim() !== '') {
+            detailNotes.textContent = order.notes;
+            notesSection.classList.remove('hidden');
+        } else {
+            notesSection.classList.add('hidden');
+        }
 
         document.getElementById('detailModal').classList.remove('hidden');
     }

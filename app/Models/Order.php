@@ -22,7 +22,8 @@ class Order extends Model
         'payment_status',
         'print_status',
         'pickup_status',
-        'status'
+        'status',
+        'notes'
     ];
 
     public function customer()

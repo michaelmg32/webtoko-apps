@@ -151,6 +151,13 @@
                             placeholder="08xxxxxxxxxx">
                     </div>
 
+                    <div>
+                        <label class="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Catatan (Opsional)</label>
+                        <textarea name="notes" id="orderNotes"
+                            class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+                            placeholder="Tambahkan catatan atau instruksi khusus untuk pesanan ini..." rows="3"></textarea>
+                    </div>
+
                     <div class="flex items-center gap-3 p-2.5 bg-blue-50 rounded-xl border border-blue-100">
                         <input type="checkbox" id="isAmateur" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
                         <label for="isAmateur" class="text-sm font-bold text-blue-800 cursor-pointer">Gunakan Harga Amatir</label>

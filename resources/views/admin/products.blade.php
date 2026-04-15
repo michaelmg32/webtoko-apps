@@ -147,25 +147,32 @@
         @endforelse
     </div>
 
-    <div id="loadMoreContainer" class="mt-8 flex flex-col items-center gap-4">
-        <p id="productCount" class="text-sm text-gray-600 font-medium"></p>
-        <button id="loadMoreBtn" type="button" 
-            class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-8 py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20">
-            <i class="fas fa-arrow-down text-lg"></i> 
-            <span>Tampilkan 10 Lebih Banyak</span>
-        </button>
+    <!-- Infinite Scroll Trigger -->
+    <div id="scrollTrigger" class="mt-12 flex justify-center">
+        <div class="text-center py-8">
+            <div class="inline-flex items-center gap-2">
+                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                <p class="text-sm text-gray-500">Scroll untuk muat lebih banyak...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Count -->
+    <div class="mt-2 text-center">
+        <p id="productCount" class="text-sm font-medium text-gray-600"></p>
     </div>
 </div>
 
 <script>
-// Expand/Load More Logic
+// Infinite Scroll Logic
 const itemsPerLoad = 10;
 let itemsShown = itemsPerLoad;
 const productSearchInput = document.getElementById('productSearch');
 const categoryTabs = document.querySelectorAll('.category-tab');
-const loadMoreBtn = document.getElementById('loadMoreBtn');
 const productCount = document.getElementById('productCount');
+const scrollTrigger = document.getElementById('scrollTrigger');
 let selectedCategory = 'all';
+let isLoading = false;
 
 function updateVisibility() {
     const allRows = document.querySelectorAll('.product-row');
@@ -198,11 +205,11 @@ function updateVisibility() {
     // Update product count
     productCount.textContent = `Menampilkan ${visibleCount} dari ${totalVisible} produk`;
 
-    // Show/Hide button
+    // Sembunyikan scroll trigger jika sudah semua
     if (visibleCount >= totalVisible) {
-        loadMoreBtn.style.display = 'none';
+        scrollTrigger.style.display = 'none';
     } else {
-        loadMoreBtn.style.display = 'flex';
+        scrollTrigger.style.display = 'block';
     }
 }
 
@@ -223,11 +230,42 @@ function filterProducts() {
             row.dataset.display = 'visible';
         } else {
             row.dataset.display = 'hidden';
-            row.style.display = 'none';
         }
     });
 
     updateVisibility();
+}
+
+function loadMoreItems() {
+    if (isLoading) return;
+    isLoading = true;
+    
+    // Simulate loading delay
+    setTimeout(() => {
+        itemsShown += itemsPerLoad;
+        updateVisibility();
+        isLoading = false;
+    }, 300);
+}
+
+// Setup Intersection Observer untuk infinite scroll
+const observerOptions = {
+    root: null,
+    rootMargin: '100px',
+    threshold: 0.1
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !isLoading) {
+            loadMoreItems();
+        }
+    });
+}, observerOptions);
+
+// Observe scroll trigger element
+if (scrollTrigger) {
+    observer.observe(scrollTrigger);
 }
 
 productSearchInput?.addEventListener('input', filterProducts);
@@ -235,7 +273,6 @@ productSearchInput?.addEventListener('input', filterProducts);
 categoryTabs.forEach(tab => {
     tab.addEventListener('click', function() {
         selectedCategory = this.dataset.category;
-        itemsShown = itemsPerLoad; // Reset ke 10 setiap kali filter
 
         // Styling tab
         categoryTabs.forEach(t => {
@@ -250,12 +287,7 @@ categoryTabs.forEach(tab => {
     });
 });
 
-// Load More button
-loadMoreBtn?.addEventListener('click', function() {
-    itemsShown += itemsPerLoad;
-    updateVisibility();
-});
-
+// Initialize
 filterProducts();
 
 // Fungsi Delete

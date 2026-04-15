@@ -348,8 +348,15 @@
     const expandBtn = document.getElementById('expandBtn');
     const expandContainer = document.getElementById('expandContainer');
 
+    console.log('Button elements:', { expandBtn, expandContainer });
+    
     if (expandBtn) {
-        expandBtn.addEventListener('click', loadMoreOrders);
+        expandBtn.addEventListener('click', function(e) {
+            console.log('Button clicked!', { isLoading, itemsShown, itemsPerLoad });
+            loadMoreOrders();
+        });
+    } else {
+        console.warn('expandBtn not found!');
     }
 
     function updateOrderVisibility() {
@@ -377,6 +384,8 @@
             }
         });
 
+        console.log('updateOrderVisibility:', { totalVisible, itemsShown, shouldShowButton: totalVisible > itemsShown, totalRows: allRows.length });
+
         // Tampilkan button jika ada lebih banyak yang bisa di-load
         if (totalVisible > itemsShown) {
             expandContainer.style.display = 'flex';
@@ -386,18 +395,25 @@
     }
 
     function loadMoreOrders() {
-        if (isLoading) return;
+        console.log('loadMoreOrders called - before:', { isLoading, itemsShown });
+        if (isLoading) {
+            console.warn('Already loading, skipping');
+            return;
+        }
         isLoading = true;
         expandBtn.disabled = true;
         expandBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div><span>Memuat...</span>';
         
         itemsShown += itemsPerLoad;
+        console.log('loadMoreOrders - after increment:', { itemsShown });
         
         setTimeout(() => {
+            console.log('Calling updateOrderVisibility from setTimeout');
             updateOrderVisibility();
             expandBtn.disabled = false;
             expandBtn.innerHTML = '<i class="fas fa-chevron-down"></i><span>Muat Lebih Banyak</span>';
             isLoading = false;
+            console.log('loadMoreOrders completed');
         }, 300);
     }
 
@@ -502,7 +518,10 @@
         const search = document.getElementById('searchInput').value.toLowerCase();
         const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
         
+        console.log('filterTable called:', { search, hideTaken });
+        
         // Filter rows based on search & checkbox
+        let filteredCount = 0;
         document.querySelectorAll('.order-row').forEach(row => {
             const text = (row.dataset.customerName || '').toLowerCase() + (row.dataset.orderCode || '').toLowerCase();
             const isTaken = row.dataset.status === 'taken';
@@ -510,8 +529,10 @@
             const shouldShow = matchesSearch && (!hideTaken || !isTaken);
             
             row.setAttribute('data-filtered', shouldShow ? 'true' : 'false');
+            if (shouldShow) filteredCount++;
         });
         
+        console.log('filterTable - filtered rows found:', filteredCount);
         itemsShown = 15; // Reset to 15 when filtering
         updateOrderVisibility();
     }

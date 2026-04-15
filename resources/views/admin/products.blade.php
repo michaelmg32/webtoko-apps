@@ -49,85 +49,89 @@
 
     <div id="productListContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         @forelse($products as $product)
-            <div class="product-row bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group relative flex flex-col h-full"
-                data-category="{{ in_array(strtolower($product->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($product->category), ['goods', 'barang']) ? 'barang' : strtolower($product->category)) }}">
+            @php
+                $categoryKey = in_array(strtolower($product->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($product->category), ['goods', 'barang']) ? 'barang' : strtolower($product->category));
+                $categoryBg = match($categoryKey) {
+                    'cetak' => 'from-blue-600 to-blue-700',
+                    'barang' => 'from-orange-600 to-orange-700',
+                    'studio' => 'from-purple-600 to-purple-700',
+                    default => 'from-gray-600 to-gray-700'
+                };
+                $categoryIcon = match($categoryKey) {
+                    'cetak' => 'fa-print',
+                    'barang' => 'fa-shopping-bag',
+                    'studio' => 'fa-camera',
+                    default => 'fa-box'
+                };
+                $categoryLabel = match($categoryKey) {
+                    'cetak' => 'Cetak',
+                    'barang' => 'Barang',
+                    'studio' => 'Studio',
+                    default => 'Lainnya'
+                };
+            @endphp
+            
+            <div class="product-row bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group relative flex flex-col h-full"
+                data-category="{{ $categoryKey }}"
+                data-name="{{ strtolower($product->name) }}"
+                data-sku="{{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}">
                 
-                <!-- Header dengan Icon -->
-                <div class="bg-gradient-to-br from-blue-50 to-gray-50 p-4 flex items-center justify-between border-b border-gray-100">
-                    <div class="relative">
-                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform shadow-sm">
-                            <i class="fas fa-box text-lg"></i>
-                        </div>
-                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
+                <!-- Image Placeholder Header -->
+                <div class="bg-gradient-to-br {{ $categoryBg }} h-32 flex items-center justify-center relative overflow-hidden group">
+                    <div class="absolute inset-0 opacity-10">
+                        <i class="fas {{ $categoryIcon }} text-9xl text-white absolute -right-8 -top-8 transform rotate-12"></i>
                     </div>
+                    <i class="fas {{ $categoryIcon }} text-6xl text-white/80 relative z-10 group-hover:scale-110 transition-transform"></i>
                     
-                    @php
-                        $categoryBadgeClass = 'bg-gray-100 text-gray-600';
-                        $categoryLabel = 'Other';
-                        
-                        if (in_array(strtolower($product->category), ['print', 'cetak'])) {
-                            $categoryBadgeClass = 'bg-blue-100 text-blue-700';
-                            $categoryLabel = 'Cetak';
-                        } elseif (strtolower($product->category) === 'studio') {
-                            $categoryBadgeClass = 'bg-purple-100 text-purple-700';
-                            $categoryLabel = 'Studio';
-                        } elseif (in_array(strtolower($product->category), ['goods', 'barang'])) {
-                            $categoryBadgeClass = 'bg-orange-100 text-orange-700';
-                            $categoryLabel = 'Barang';
-                        }
-                    @endphp
-                    <span class="text-xs font-bold {{ $categoryBadgeClass }} px-2.5 py-1 rounded-lg">{{ $categoryLabel }}</span>
+                    <!-- Category Badge -->
+                    <span class="absolute top-3 right-3 bg-white text-gray-900 text-xs font-black px-3 py-1.5 rounded-full shadow-lg">
+                        {{ $categoryLabel }}
+                    </span>
+                    
+                    <!-- Stock Indicator -->
+                    <div class="absolute bottom-3 left-3 flex items-center gap-1 bg-white/95 px-2.5 py-1 rounded-full shadow-sm">
+                        <div class="w-2 h-2 {{ $product->unlimited_stock ? 'bg-green-500' : ($product->stock > 0 ? 'bg-yellow-500' : 'bg-red-500') }} rounded-full"></div>
+                        <span class="text-xs font-bold text-gray-700">
+                            {{ $product->unlimited_stock ? '∞' : $product->stock ?? 0 }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Content -->
                 <div class="p-4 flex-1 flex flex-col gap-3">
+                    <!-- Product Name -->
                     <div>
-                        <h4 class="font-bold text-gray-900 text-sm group-hover:text-blue-600 transition-colors line-clamp-2">
+                        <h4 class="font-black text-gray-900 text-base group-hover:text-blue-600 transition-colors line-clamp-2 product-name">
                             {{ $product->name }}
                         </h4>
-                        <p class="text-xs text-gray-500 mt-1 font-medium">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</p>
+                        <p class="text-xs text-gray-500 mt-2 font-mono font-bold product-sku">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</p>
                     </div>
+
+                    <!-- Divider -->
+                    <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
 
                     <!-- Price -->
-                    <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
-                        <p class="text-xs text-gray-600 font-medium mb-0.5">Harga Utama</p>
-                        <p class="font-black text-blue-600 text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                    </div>
-
-                    <!-- Stock Status -->
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-warehouse text-xs text-gray-400"></i>
-                        <div class="text-xs">
-                            <p class="text-gray-600 font-medium">Status Stok</p>
-                            @if($product->unlimited_stock)
-                                <span class="inline-flex items-center gap-1 text-green-600 font-bold">
-                                    <i class="fas fa-infinity text-xs"></i> Unlimited
-                                </span>
-                            @else
-                                <span class="text-gray-700 font-bold">{{ $product->stock ?? 0 }} Unit</span>
-                            @endif
-                        </div>
+                    <div class="space-y-1">
+                        <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Harga Utama</p>
+                        <p class="font-black text-lg text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="bg-gray-50 border-t border-gray-100 p-3 flex gap-2 justify-end">
+                <div class="bg-gray-50 border-t border-gray-100 p-3 grid grid-cols-2 gap-2">
                     <a href="{{ route('admin.products.edit', $product->id) }}" 
-                       class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all font-medium text-sm shadow-sm active:scale-95"
-                       title="Edit Produk">
-                        <i class="fas fa-edit text-xs"></i>
-                        <span class="hidden sm:inline">Edit</span>
+                       class="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all font-bold text-xs shadow-sm active:scale-95">
+                        <i class="fas fa-edit"></i>
+                        <span>Edit</span>
                     </a>
                     <button type="button" 
-                       class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all font-medium text-sm shadow-sm active:scale-95" 
+                       class="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all font-bold text-xs shadow-sm active:scale-95" 
                        onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')"
                        title="Hapus Produk">
-                        <i class="fas fa-trash text-xs"></i>
-                        <span class="hidden sm:inline">Hapus</span>
+                        <i class="fas fa-trash"></i>
+                        <span>Hapus</span>
                     </button>
                 </div>
-
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
             </div>
         @empty
             <div class="col-span-full bg-white rounded-2xl border-2 border-dashed border-gray-200 py-20 text-center">
@@ -199,11 +203,11 @@ function filterProducts() {
     itemsShown = itemsPerLoad; // Reset ke 10 setiap kali search
 
     document.querySelectorAll('.product-row').forEach(row => {
-        const name = row.querySelector('h4')?.textContent.toLowerCase() || '';
-        const sku = row.querySelector('.text-xs')?.textContent.toLowerCase() || '';
-        const category = row.dataset.category.toLowerCase();
+        const name = row.dataset.name || '';
+        const sku = row.dataset.sku || '';
+        const category = row.dataset.category || '';
 
-        const matchesSearch = name.includes(searchTerm) || sku.includes(searchTerm) || category.includes(searchTerm);
+        const matchesSearch = !searchTerm || name.includes(searchTerm) || sku.toLowerCase().includes(searchTerm) || category.includes(searchTerm);
         const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
 
         // Mark as hidden or not

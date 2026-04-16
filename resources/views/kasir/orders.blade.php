@@ -640,7 +640,7 @@ function printReceipt() {
                 }
                 .receipt-item-detail {
                     font-size: 12pt;
-                    color: #666;
+                    color: #000;
                     display: flex;
                     justify-content: space-between;
                 }

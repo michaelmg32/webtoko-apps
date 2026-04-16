@@ -602,7 +602,7 @@ function printReceipt() {
                     box-sizing: border-box;
                 }
                 body {
-                    font-family: 'Courier New', monospace;
+                    font-family: 'Arial', 'Helvetica', sans-serif;
                     width: 80mm;
                     margin: 0 auto;
                     padding: 5mm;

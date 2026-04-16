@@ -614,7 +614,6 @@ function printReceipt() {
                 }
                 .receipt-header {
                     margin-bottom: 12pt;
-                    font-weight: bold;
                     font-size: 14pt;
                 }
                 .receipt-divider {
@@ -638,7 +637,6 @@ function printReceipt() {
                     display: flex;
                     justify-content: space-between;
                     margin-bottom: 3pt;
-                    font-weight: bold;
                 }
                 .receipt-item-detail {
                     font-size: 12pt;
@@ -658,7 +656,6 @@ function printReceipt() {
                 }
                 .receipt-total {
                     font-size: 15pt;
-                    font-weight: bold;
                     border-top: 2px solid #000;
                     padding-top: 8pt;
                     margin-top: 8pt;

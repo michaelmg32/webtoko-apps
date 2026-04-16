@@ -609,62 +609,64 @@ function printReceipt() {
                 }
                 .receipt {
                     text-align: center;
-                    font-size: 11pt;
-                    line-height: 1.4;
+                    font-size: 14pt;
+                    line-height: 1.5;
                 }
                 .receipt-header {
-                    margin-bottom: 10pt;
+                    margin-bottom: 12pt;
                     font-weight: bold;
+                    font-size: 14pt;
                 }
                 .receipt-divider {
                     border-top: 2px dashed #000;
-                    margin: 8pt 0;
+                    margin: 10pt 0;
                 }
                 .receipt-info {
                     text-align: left;
-                    font-size: 10pt;
-                    margin-bottom: 10pt;
+                    font-size: 13pt;
+                    margin-bottom: 12pt;
                 }
                 .receipt-items {
-                    margin-bottom: 10pt;
+                    margin-bottom: 12pt;
                     text-align: left;
-                    font-size: 10pt;
+                    font-size: 13pt;
                 }
                 .receipt-item {
-                    margin-bottom: 5pt;
+                    margin-bottom: 8pt;
                 }
                 .receipt-item-name {
                     display: flex;
                     justify-content: space-between;
-                    margin-bottom: 2pt;
+                    margin-bottom: 3pt;
+                    font-weight: bold;
                 }
                 .receipt-item-detail {
-                    font-size: 9pt;
+                    font-size: 12pt;
                     color: #666;
                     display: flex;
                     justify-content: space-between;
                 }
                 .receipt-summary {
                     text-align: right;
-                    font-size: 10pt;
-                    margin-bottom: 10pt;
+                    font-size: 13pt;
+                    margin-bottom: 12pt;
                 }
                 .receipt-summary-row {
                     display: flex;
                     justify-content: space-between;
-                    margin-bottom: 3pt;
+                    margin-bottom: 5pt;
                 }
                 .receipt-total {
-                    font-size: 12pt;
+                    font-size: 15pt;
                     font-weight: bold;
                     border-top: 2px solid #000;
-                    padding-top: 5pt;
-                    margin-top: 5pt;
+                    padding-top: 8pt;
+                    margin-top: 8pt;
                 }
                 .receipt-footer {
                     text-align: center;
-                    font-size: 10pt;
-                    margin-top: 10pt;
+                    font-size: 12pt;
+                    margin-top: 12pt;
                 }
                 @media print {
                     body {
@@ -682,8 +684,8 @@ function printReceipt() {
             <div class="receipt">
                 <div class="receipt-header">
                     <div>Bukit Foto Studio Cab Km9</div>
-                    <div style="font-size: 10pt; font-weight: normal; margin-top: 3pt;">Jl. Kolonel H. Barlian, Kebun Bunga, Kec. Sukarami, Kota Palembang, Sumatera Selatan 30152</div>
-                    <div style="font-size: 9pt; margin-top: 2pt;">Telp: 0851-5695-6302</div>
+                    <div style="font-size: 12pt; font-weight: normal; margin-top: 3pt;">Jl. Kolonel H. Barlian, Kebun Bunga, Kec. Sukarami, Kota Palembang, Sumatera Selatan 30152</div>
+                    <div style="font-size: 11pt; margin-top: 2pt;">Telp: 0851-5695-6302</div>
                 </div>
                 
                 <div class="receipt-divider"></div>

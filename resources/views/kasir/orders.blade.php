@@ -173,25 +173,20 @@
 
                     <!-- Action Buttons -->
                     <div class="space-y-2 pt-4">
-                        <form id="finalizeForm" method="POST" action="{{ route('kasir.pay') }}">
+                        <button type="button" id="finalizeBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition flex items-center justify-center gap-2" onclick="handleFinalize()" disabled>
+                            <i class="fas fa-check-circle"></i> LANJUTKAN PESANAN
+                        </button>
+
+                        <button type="button" id="cancelBtn" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2" onclick="cancelOrder()" disabled>
+                            <i class="fas fa-times-circle"></i> KEMBALI
+                        </button>
+
+                        <form id="finalizeForm" method="POST" action="{{ route('kasir.pay') }}" style="display: none;">
                             @csrf
                             <input type="hidden" id="selectedOrderId" name="order_id">
                             <input type="hidden" id="paymentMethod" name="method">
                             <input type="hidden" id="paymentAmount" name="amount">
-
-                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition flex items-center justify-center gap-2"
-                                id="finalizeBtn" disabled>
-                                <i class="fas fa-check-circle"></i> FINALIZE TRANSACTION
-                            </button>
                         </form>
-
-                        <button type="button" id="viewOrderButton" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2" onclick="showReceiptPopup()" disabled>
-                            <i class="fas fa-file-pdf"></i> VIEW RECEIPT
-                        </button>
-
-                        <button type="button" id="cancelBtn" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2" onclick="cancelOrder()" disabled>
-                            <i class="fas fa-times-circle"></i> Cancel
-                        </button>
                     </div>
                 </div>
             </div>
@@ -214,10 +209,13 @@
         <div class="p-6 overflow-y-auto max-h-[70vh] bg-white" id="receiptContent"></div>
         <div class="flex gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
             <button type="button" onclick="printReceipt()" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2">
-                <i class="fas fa-print"></i> Print
+                <i class="fas fa-print"></i> PRINT
+            </button>
+            <button type="button" onclick="finalizeTransactionFromModal()" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2">
+                <i class="fas fa-check"></i> LANJUTKAN
             </button>
             <button type="button" onclick="closeReceiptPopup()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-lg font-semibold transition">
-                Close
+                TUTUP
             </button>
         </div>
     </div>
@@ -333,13 +331,7 @@ function generatePaymentTabs(paymentStatus) {
     currentPaymentType = tabs[0].type;
     renderPaymentForm(tabs[0].type);
     
-    // Handle VIEW RECEIPT button visibility for initial tab
-    const viewOrderButton = document.getElementById('viewOrderButton');
-    if (tabs[0].type === 'dp') {
-        viewOrderButton.style.display = 'none';
-    } else {
-        viewOrderButton.style.display = 'block';
-    }
+
 }
 
 function selectPaymentType(btn) {
@@ -360,14 +352,6 @@ function selectPaymentType(btn) {
 
     currentPaymentType = type;
     renderPaymentForm(type);
-    
-    // Hide VIEW RECEIPT button for DP payment type
-    const viewOrderButton = document.getElementById('viewOrderButton');
-    if (type === 'dp') {
-        viewOrderButton.style.display = 'none';
-    } else {
-        viewOrderButton.style.display = 'block';
-    }
 }
 
 function selectOrder(element) {
@@ -411,7 +395,6 @@ function selectOrder(element) {
     // Set hidden inputs
     document.getElementById('selectedOrderId').value = orderId;
     document.getElementById('paymentAmount').value = selectedOrderData.total_price;
-    document.getElementById('viewOrderButton').disabled = false;
     document.getElementById('cancelBtn').disabled = false;
     
     // Generate payment tabs based on payment status
@@ -806,6 +789,66 @@ function printReceipt() {
     setTimeout(function() {
         printWindow.print();
     }, 250);
+}
+
+// Handle finalize button click - show receipt first
+function handleFinalize() {
+    // Validate payment method is selected
+    const method = document.getElementById('paymentMethod').value;
+    if (!method) {
+        showNotification('Silahkan pilih metode pembayaran', 'warning');
+        return;
+    }
+    
+    // Show receipt modal instead of submitting directly
+    showReceiptPopup();
+}
+
+// Handle finalization from receipt modal - actually submit the payment
+function finalizeTransactionFromModal() {
+    const method = document.getElementById('paymentMethod').value;
+    const orderId = document.getElementById('selectedOrderId').value;
+    
+    if (!method) {
+        showNotification('Silahkan pilih metode pembayaran', 'warning');
+        return false;
+    }
+    
+    if (currentPaymentType === 'full') {
+        // Submit to old payment form
+        document.getElementById('finalizeForm').submit();
+    } else if (currentPaymentType === 'dp') {
+        const amount = parseInt(document.getElementById('dpAmountInput')?.value || 0);
+        const dpAmount = parseInt(selectedOrderData.dp_amount || 0);
+        const paymentsPaidAmount = selectedOrderData.payments?.reduce((sum, p) => sum + parseInt(p.amount || 0), 0) || 0;
+        const totalPaid = dpAmount > 0 ? dpAmount : paymentsPaidAmount;
+        const maxAmount = parseInt(selectedOrderData.total_price) || 0;
+        const maxRemaining = maxAmount - totalPaid;
+        if (amount <= 0 || amount > maxRemaining) {
+            showNotification('Jumlah DP tidak valid', 'warning');
+            return;
+        }
+        
+        // Submit DP payment via AJAX
+        submitDPPayment(orderId, amount, method);
+    } else if (currentPaymentType === 'pelunasan') {
+        const amount = parseInt(document.getElementById('pelunasanAmountInput')?.value || 0);
+        const dpAmount = parseInt(selectedOrderData.dp_amount || 0);
+        const paymentsPaidAmount = selectedOrderData.payments?.reduce((sum, p) => sum + parseInt(p.amount || 0), 0) || 0;
+        const totalPaid = dpAmount > 0 ? dpAmount : paymentsPaidAmount;
+        const maxAmount = parseInt(selectedOrderData.total_price) || 0;
+        const maxRemaining = maxAmount - totalPaid;
+        
+        if (amount <= 0 || amount > maxRemaining) {
+            showNotification('Jumlah pelunasan tidak valid', 'warning');
+            return;
+        }
+        
+        // Submit pelunasan payment via AJAX
+        submitPelunasanPayment(orderId, amount, method);
+    }
+    
+    return false;
 }
 
 // Form validation and submission handler

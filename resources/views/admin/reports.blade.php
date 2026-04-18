@@ -147,7 +147,7 @@
         </div>
 
         <div class="p-6 bg-gray-50/50 border-b border-gray-100">
-            <form method="GET" action="{{ route('admin.reports.index') }}">
+            <form id="autoFilterForm" method="GET" action="{{ route('admin.reports.index') }}">
                 <input type="hidden" name="period" value="{{ $period }}">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
@@ -184,16 +184,26 @@
                         </select>
                     </div>
 
-                    <div class="lg:col-span-1 flex gap-2">
-                        <button type="submit" class="flex-1 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                            <i class="fas fa-search text-xs"></i> Filter
-                        </button>
-                        <a href="{{ route('admin.reports.index', ['period' => $period]) }}" class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center" title="Reset Filters">
+                    <div class="lg:col-span-1">
+                        <a href="{{ route('admin.reports.index', ['period' => $period]) }}" class="w-full px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center" title="Reset Filters">
                             <i class="fas fa-redo text-xs"></i>
                         </a>
                     </div>
                 </div>
             </form>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const filterForm = document.getElementById('autoFilterForm');
+                    const filterInputs = filterForm.querySelectorAll('input[type="date"], select');
+                    
+                    filterInputs.forEach(input => {
+                        input.addEventListener('change', function() {
+                            filterForm.submit();
+                        });
+                    });
+                });
+            </script>
         </div>
 
         @if($recentOrders->count() > 0)

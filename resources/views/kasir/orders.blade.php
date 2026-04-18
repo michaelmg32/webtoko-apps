@@ -800,7 +800,13 @@ function handleFinalize() {
         return;
     }
     
-    // Show receipt modal instead of submitting directly
+    // For DP payment, submit directly without showing receipt
+    if (currentPaymentType === 'dp') {
+        finalizeTransactionFromModal();
+        return;
+    }
+    
+    // For full and pelunasan, show receipt modal first
     showReceiptPopup();
 }
 
@@ -1281,7 +1287,6 @@ function deleteOrderConfirmed() {
 
             // Disable buttons
             document.getElementById('finalizeBtn').disabled = true;
-            document.getElementById('viewOrderButton').disabled = true;
             document.getElementById('cancelBtn').disabled = true;
 
             // Clear form inputs

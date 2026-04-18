@@ -137,7 +137,7 @@
                                     };
                                     $printLabel = match($printStatus) {
                                         'printed' => 'Sudah Dicetak',
-                                        'pending' => 'Menunggu Cetak',
+                                        'pending' => 'Belum Cetak',
                                         default => 'Tidak Ada Cetak'
                                     };
                                 @endphp
@@ -150,7 +150,7 @@
                                 @php
                                     $pickupStatus = $order->pickup_status ?? 'waiting';
                                     $statusBadge = $pickupStatus === 'taken' ? 'bg-slate-200 text-slate-600' : 'bg-blue-600 text-white shadow-md shadow-blue-100';
-                                    $statusLabel = $pickupStatus === 'taken' ? 'Sudah Diambil' : 'Menunggu Diambil';
+                                    $statusLabel = $pickupStatus === 'taken' ? 'Sudah Diambil' : 'Belum Diambil';
                                 @endphp
                                 <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase {{ $statusBadge }} status-badge">
                                     {{ $statusLabel }}
@@ -275,7 +275,7 @@
         <div class="space-y-3 mb-8">
             <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all group">
                 <input type="radio" name="pickupStatus" value="waiting" class="w-5 h-5 text-green-600 focus:ring-green-500">
-                <span class="ml-4 font-bold text-slate-700 group-hover:text-slate-900">Menunggu Diambil</span>
+                <span class="ml-4 font-bold text-slate-700 group-hover:text-slate-900">Belum Diambil</span>
             </label>
             <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all group">
                 <input type="radio" name="pickupStatus" value="taken" class="w-5 h-5 text-green-600 focus:ring-green-500">
@@ -572,7 +572,7 @@
                 if (row) {
                     row.dataset.status = selectedStatus;
                     const statusBadge = row.querySelector('.status-badge');
-                    const statusText = selectedStatus === 'taken' ? 'Sudah Diambil' : 'Menunggu Diambil';
+                    const statusText = selectedStatus === 'taken' ? 'Sudah Diambil' : 'Belum Diambil';
                     const statusClass = selectedStatus === 'taken' 
                         ? 'bg-slate-200 text-slate-600' 
                         : 'bg-blue-600 text-white shadow-md shadow-blue-100';

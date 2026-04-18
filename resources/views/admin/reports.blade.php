@@ -217,8 +217,8 @@
                                 <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($order->payment_date)->format('H:i') }} WIB</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-xs text-gray-500">{{ $order->categories }}</div>
-                                <div class="text-sm font-bold text-blue-600 mt-0.5">{{ $order->order_code }}</div>
+                                <div class="text-sm font-bold text-blue-600">{{ $order->categories }}</div>
+                                <div class="text-xs text-gray-500 mt-0.5">{{ $order->order_code }}</div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700 font-medium">
                                 {{ $order->customer_name }}

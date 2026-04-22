@@ -474,7 +474,7 @@
             return `
                 <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-start mb-1">
-                        <span class="font-black text-slate-800 text-sm">${item.product?.name || item.product_name}</span>
+                        <span class="font-black text-slate-800 text-sm">${item.product_name || item.product?.name}</span>
                         <span class="text-xs font-black text-slate-400">×${qty}</span>
                     </div>
                     <div class="flex items-center gap-2">

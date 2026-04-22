@@ -69,7 +69,7 @@
                                     <p class="text-sm text-gray-600">
                                         @if($order->items->count() > 0)
                                             @foreach($order->items->take(2) as $item)
-                                                <span class="inline-block">{{ $item->product->name }}{{ !$loop->last ? ', ' : '' }}</span>
+                                                <span class="inline-block">{{ $item->product_name ?? $item->product->name }}{{ !$loop->last ? ', ' : '' }}</span>
                                             @endforeach
                                             @if($order->items->count() > 2)
                                                 <span class="text-gray-400">{{ '+' . ($order->items->count() - 2) . ' more' }}</span>

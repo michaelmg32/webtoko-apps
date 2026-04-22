@@ -105,7 +105,7 @@
                                                         {{ $item->quantity }}x
                                                     </div>
                                                     <div>
-                                                        <p class="text-sm font-bold text-gray-800">{{ $item->product->name }}</p>
+                                                        <p class="text-sm font-bold text-gray-800">{{ $item->product_name ?? $item->product->name }}</p>
                                                         <p class="text-[10px] text-gray-500 uppercase">
                                                             {{ $item->product->category }}</p>
                                                     </div>

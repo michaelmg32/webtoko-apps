@@ -417,7 +417,7 @@ function updatePaymentTerminal(element) {
     // Update items with quantity and price
     const orderData = JSON.parse(element.dataset.order);
     const itemsHtml = orderData.items.map(item => {
-        const productName = item.product?.name || 'Item';
+        const productName = item.product_name || item.product?.name || 'Item';
         const qty = item.quantity;
         const price = Number(item.price);
         const discount = Number(item.discount || 0);
@@ -475,7 +475,7 @@ function showReceiptPopup() {
     const content = document.getElementById('receiptContent');
 
     const itemsHtml = selectedOrderData.items.map(item => {
-        const productName = item.product?.name || 'Item';
+        const productName = item.product_name || item.product?.name || 'Item';
         const qty = item.quantity;
         const price = Number(item.price);
         const discount = Number(item.discount || 0);
@@ -686,7 +686,7 @@ function printReceipt() {
                 
                 <div class="receipt-items">
                     ${selectedOrderData.items.map(item => {
-                        const productName = item.product?.name || 'Item';
+                        const productName = item.product_name || item.product?.name || 'Item';
                         const qty = item.quantity;
                         const price = Number(item.price);
                         const discount = Number(item.discount || 0);

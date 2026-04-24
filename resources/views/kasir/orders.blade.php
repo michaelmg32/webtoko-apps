@@ -552,7 +552,6 @@ function showReceiptPopup() {
             <div class="border-t-2 border-dashed border-gray-400 mb-4"></div>
             ${itemsHtml}
             <div class="border-t-2 border-dashed border-gray-400 mb-4"></div>
-            <div class="mb-2 flex justify-between text-sm"><span>Total QTY</span><span class="font-semibold">${totalQty}</span></div>
             <div class="mb-2 flex justify-between text-sm"><span>Sub Total</span><span class="font-semibold">Rp ${subtotal.toLocaleString('id-ID')}</span></div>
             ${discountHtml}
             <div class="mb-3 flex justify-between text-base font-bold border-t-2 border-gray-300 pt-2"><span>Total</span><span>Rp ${totalPrice.toLocaleString('id-ID')}</span></div>
@@ -714,10 +713,7 @@ function printReceipt() {
                 <div class="receipt-divider"></div>
                 
                 <div class="receipt-summary">
-                    <div class="receipt-summary-row">
-                        <span>Total QTY</span>
-                        <span>${selectedOrderData.items.reduce((sum, item) => sum + Number(item.quantity), 0)}</span>
-                    </div>
+
                     <div class="receipt-summary-row">
                         <span>Sub Total</span>
                         <span>Rp ${(() => {

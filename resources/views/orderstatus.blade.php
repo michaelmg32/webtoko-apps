@@ -7,7 +7,7 @@
 <div class="space-y-6 animate-in fade-in duration-500">
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-red-500 flex items-center justify-between">
+        <button type="button" onclick="filterByStatus('unpaid')" class="status-card-btn text-left bg-white rounded-2xl shadow-sm p-6 border-l-4 border-red-500 flex items-center justify-between hover:shadow-lg transition-all active:scale-95 cursor-pointer" data-status-type="unpaid">
             <div>
                 <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Belum Dibayar</p>
                 <p class="text-3xl font-black text-slate-800 mt-1">{{ $unpaidOrders ?? 0 }}</p>
@@ -15,9 +15,9 @@
             <div class="bg-red-50 rounded-xl p-4 text-red-600">
                 <i class="fas fa-credit-card text-2xl"></i>
             </div>
-        </div>
+        </button>
 
-        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-purple-500 flex items-center justify-between">
+        <button type="button" onclick="filterByStatus('not_printed')" class="status-card-btn text-left bg-white rounded-2xl shadow-sm p-6 border-l-4 border-purple-500 flex items-center justify-between hover:shadow-lg transition-all active:scale-95 cursor-pointer" data-status-type="not_printed">
             <div>
                 <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Belum Dicetak</p>
                 <p class="text-3xl font-black text-slate-800 mt-1">{{ $notPrintedOrders ?? 0 }}</p>
@@ -25,9 +25,9 @@
             <div class="bg-purple-50 rounded-xl p-4 text-purple-600">
                 <i class="fas fa-print text-2xl"></i>
             </div>
-        </div>
+        </button>
 
-        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-orange-500 flex items-center justify-between">
+        <button type="button" onclick="filterByStatus('waiting')" class="status-card-btn text-left bg-white rounded-2xl shadow-sm p-6 border-l-4 border-orange-500 flex items-center justify-between hover:shadow-lg transition-all active:scale-95 cursor-pointer" data-status-type="waiting">
             <div>
                 <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Belum Diambil</p>
                 <p class="text-3xl font-black text-slate-800 mt-1">{{ $waitingItemsCount ?? 0 }}</p>
@@ -35,7 +35,7 @@
             <div class="bg-orange-50 rounded-xl p-4 text-orange-600">
                 <i class="fas fa-box text-2xl"></i>
             </div>
-        </div>
+        </button>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -96,7 +96,9 @@
                             data-date="{{ $order->created_at?->getTimestamp() ?? 0 }}"
                             data-amount="{{ $order->total_price ?? 0 }}"
                             data-status="{{ $order->pickup_status ?? 'waiting' }}"
-                            data-pickup-status="{{ $order->pickup_status ?? 'waiting' }}">
+                            data-pickup-status="{{ $order->pickup_status ?? 'waiting' }}"
+                            data-payment-status="{{ $order->payment_status ?? 'unpaid' }}"
+                            data-print-status="{{ $order->print_status ?? 'not_needed' }}">
                             
                             <td class="px-6 py-4">
                                 <div>
@@ -327,6 +329,9 @@
 </div>
 
 <script>
+    // --- STATUS FILTER VARIABLES ---
+    let activeStatusFilter = null; // null, 'unpaid', 'not_printed', or 'waiting'
+
     // --- EXPAND BUTTON + FILTER LOGIC ---
     let itemsShown = 15; // Start with 15 items
     const itemsPerLoad = 15; // Load 15 more on each click
@@ -357,6 +362,30 @@
         });
     } else {
         console.warn('expandBtn not found!');
+    }
+
+    // Status Filter Function
+    function filterByStatus(statusType) {
+        // Toggle filter off if clicking the same button
+        if (activeStatusFilter === statusType) {
+            activeStatusFilter = null;
+        } else {
+            activeStatusFilter = statusType;
+        }
+
+        // Update visual state of status cards
+        document.querySelectorAll('.status-card-btn').forEach(btn => {
+            const btnStatusType = btn.dataset.statusType;
+            if (activeStatusFilter === btnStatusType) {
+                btn.classList.add('ring-2', 'ring-offset-2', 'ring-slate-400', 'bg-slate-50', 'shadow-xl');
+            } else {
+                btn.classList.remove('ring-2', 'ring-offset-2', 'ring-slate-400', 'bg-slate-50', 'shadow-xl');
+            }
+        });
+
+        // Re-apply filters
+        itemsShown = 15; // Reset pagination
+        filterTable();
     }
 
     function updateOrderVisibility() {
@@ -528,15 +557,26 @@
         const search = document.getElementById('searchInput').value.toLowerCase();
         const hideTaken = document.getElementById('hideCompletedCheckbox').checked;
         
-        console.log('filterTable called:', { search, hideTaken });
+        console.log('filterTable called:', { search, hideTaken, activeStatusFilter });
         
-        // Filter rows based on search & checkbox
+        // Filter rows based on search, checkbox, and active status filter
         let filteredCount = 0;
         document.querySelectorAll('.order-row').forEach(row => {
             const text = (row.dataset.customerName || '').toLowerCase() + (row.dataset.orderCode || '').toLowerCase();
             const isTaken = row.dataset.status === 'taken';
             const matchesSearch = text.includes(search);
-            const shouldShow = matchesSearch && (!hideTaken || !isTaken);
+            
+            // Apply status filter
+            let matchesStatusFilter = true;
+            if (activeStatusFilter === 'unpaid') {
+                matchesStatusFilter = row.dataset.paymentStatus === 'unpaid';
+            } else if (activeStatusFilter === 'not_printed') {
+                matchesStatusFilter = row.dataset.printStatus === 'pending';
+            } else if (activeStatusFilter === 'waiting') {
+                matchesStatusFilter = row.dataset.pickupStatus === 'waiting';
+            }
+            
+            const shouldShow = matchesSearch && (!hideTaken || !isTaken) && matchesStatusFilter;
             
             row.setAttribute('data-filtered', shouldShow ? 'true' : 'false');
             if (shouldShow) filteredCount++;

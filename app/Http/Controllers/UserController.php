@@ -69,6 +69,9 @@ class UserController extends Controller
             return back()->with('error', 'Tidak bisa menghapus satu-satunya admin');
         }
 
+        // Set changed_by to NULL for related order status logs instead of deleting them
+        \App\Models\OrderStatusLog::where('changed_by', $user->id)->update(['changed_by' => null]);
+
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil dihapus');

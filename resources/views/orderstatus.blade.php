@@ -123,10 +123,20 @@
                                         'partial' => 'Bayar Setengah (DP)',
                                         default => 'Belum Dibayar'
                                     };
+                                    
+                                    // Calculate DP amount
+                                    $dpAmount = $order->payments ? $order->payments->sum('amount') : 0;
                                 @endphp
-                                <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase {{ $paymentBadge }}">
-                                    {{ $paymentLabel }}
-                                </span>
+                                <div class="flex flex-col gap-2">
+                                    <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase {{ $paymentBadge }}">
+                                        {{ $paymentLabel }}
+                                    </span>
+                                    @if($paymentStatus === 'partial' && $dpAmount > 0)
+                                        <span class="px-2 py-1 rounded text-xs font-bold bg-blue-50 text-blue-700">
+                                            DP: Rp {{ number_format($dpAmount, 0, ',', '.') }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
 
                             <td class="px-6 py-4">
@@ -233,9 +243,29 @@
                     <span class="text-slate-500 font-bold text-sm">Waktu Pengambilan</span>
                     <span id="detailPickupTime" class="text-slate-800 font-bold text-sm">-</span>
                 </div>
-                <div class="flex justify-between items-center py-2">
-                    <span class="text-slate-500 font-bold text-sm">Total Jumlah</span>
+                <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold text-sm">Total Harga</span>
                     <span id="detailAmount" class="text-2xl font-black text-green-600">-</span>
+                </div>
+            </div>
+
+            <div id="paymentSection" class="hidden p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <p class="text-[10px] font-black text-blue-600 uppercase mb-3 tracking-widest">💳 Informasi Pembayaran</p>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-blue-700 font-bold">Status Pembayaran</span>
+                        <span id="detailPaymentStatus" class="text-sm font-black text-blue-900">-</span>
+                    </div>
+                    <div id="dpInfoSection" class="hidden border-t border-blue-200 pt-2">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-blue-700 font-bold">Jumlah DP</span>
+                            <span id="detailDPAmount" class="text-sm font-black text-green-600">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-blue-700 font-bold">Sisa Pembayaran</span>
+                            <span id="detailRemainingAmount" class="text-sm font-black text-red-600">Rp 0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -492,6 +522,38 @@
         const badge = document.getElementById('detailPaymentMethod');
         badge.textContent = finalMethod;
         badge.className = finalMethod === 'Belum Dibayar' ? 'px-3 py-1 rounded-lg text-xs font-black border border-red-200 bg-red-50 text-red-700' : 'px-3 py-1 rounded-lg text-xs font-black border border-green-200 bg-green-50 text-green-700';
+
+        // Payment Status Display
+        const paymentStatus = order.payment_status || 'unpaid';
+        const paymentSection = document.getElementById('paymentSection');
+        const dpInfoSection = document.getElementById('dpInfoSection');
+        const totalPrice = Number(order.total_price || 0);
+        const dpAmount = order.payments ? order.payments.reduce((sum, p) => sum + Number(p.amount || 0), 0) : 0;
+        const remainingAmount = totalPrice - dpAmount;
+
+        if (paymentStatus !== 'unpaid') {
+            paymentSection.classList.remove('hidden');
+            
+            // Set payment status text
+            let statusText = '';
+            if (paymentStatus === 'paid') {
+                statusText = '✓ Sudah Dibayar Penuh';
+            } else if (paymentStatus === 'partial') {
+                statusText = '⏳ Belum Lunas (DP)';
+            }
+            document.getElementById('detailPaymentStatus').textContent = statusText;
+
+            // Show DP info if partial payment
+            if (paymentStatus === 'partial' && dpAmount > 0) {
+                dpInfoSection.classList.remove('hidden');
+                document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
+                document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');
+            } else {
+                dpInfoSection.classList.add('hidden');
+            }
+        } else {
+            paymentSection.classList.add('hidden');
+        }
 
         // Render Items with Discount
         const container = document.getElementById('detailItems');

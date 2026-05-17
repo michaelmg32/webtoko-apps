@@ -552,9 +552,15 @@
             // Show DP breakdown
             dpInfoSection.classList.remove('hidden');
             document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
-            // Show actual payment after DP (pelunasan + full payment), not remaining
-            const paymentAfterDP = pelunasanAmount + fullPaymentAmount;
-            document.getElementById('detailRemainingAmount').textContent = 'Rp ' + paymentAfterDP.toLocaleString('id-ID');
+            
+            // If paid (lunas) - show what was paid after DP
+            // If partial (belum lunas) - show remaining amount to pay
+            if (paymentStatus === 'paid') {
+                const paymentAfterDP = pelunasanAmount + fullPaymentAmount;
+                document.getElementById('detailRemainingAmount').textContent = 'Rp ' + paymentAfterDP.toLocaleString('id-ID');
+            } else {
+                document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');
+            }
         } else {
             paymentSection.classList.add('hidden');
         }

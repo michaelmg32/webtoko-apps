@@ -71,7 +71,8 @@ class UserController extends Controller
 
         // Set changed_by to NULL for related order status logs instead of deleting them
         \App\Models\OrderStatusLog::where('changed_by', $user->id)->update(['changed_by' => null]);
-
+        // Set created_by to NULL for related orders (preserve data)
+        \App\Models\Order::where('created_by', $user->id)->update(['created_by' => null]);
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil dihapus');

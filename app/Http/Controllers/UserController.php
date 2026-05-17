@@ -73,6 +73,8 @@ class UserController extends Controller
         \App\Models\OrderStatusLog::where('changed_by', $user->id)->update(['changed_by' => null]);
         // Set created_by to NULL for related orders (preserve data)
         \App\Models\Order::where('created_by', $user->id)->update(['created_by' => null]);
+        // Set paid_by to NULL for related payments (preserve data)
+        \App\Models\Payment::where('paid_by', $user->id)->update(['paid_by' => null]);
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil dihapus');

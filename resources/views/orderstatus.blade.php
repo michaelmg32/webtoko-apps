@@ -551,8 +551,10 @@
 
             // Show DP breakdown
             dpInfoSection.classList.remove('hidden');
-            document.getElementById('detailDPAmount').textContent = 'Rp ' + totalPaid.toLocaleString('id-ID');
-            document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');
+            document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
+            // Show actual payment after DP (pelunasan + full payment), not remaining
+            const paymentAfterDP = pelunasanAmount + fullPaymentAmount;
+            document.getElementById('detailRemainingAmount').textContent = 'Rp ' + paymentAfterDP.toLocaleString('id-ID');
         } else {
             paymentSection.classList.add('hidden');
         }

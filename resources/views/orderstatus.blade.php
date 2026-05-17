@@ -520,9 +520,15 @@
         const totalPrice = Number(order.total_price || 0);
         const dpAmount = order.payments ? order.payments.reduce((sum, p) => sum + Number(p.amount || 0), 0) : 0;
         const remainingAmount = totalPrice - dpAmount;
+        const paymentCount = order.payments ? order.payments.length : 0;
 
-        // Show payment info ONLY if there are actual payments (ada DP)
-        if (order.payments && order.payments.length > 0) {
+        // Show payment info ONLY if:
+        // 1. Status is partial (ada sisa pembayaran) OR
+        // 2. Multiple payments exist (ada DP history) - not just single full payment
+        const hasMultiplePayments = paymentCount > 1;
+        const isPartialPayment = paymentStatus === 'partial';
+
+        if ((hasMultiplePayments || isPartialPayment) && order.payments && order.payments.length > 0) {
             paymentSection.classList.remove('hidden');
             
             // Set payment status text
@@ -534,7 +540,7 @@
             }
             document.getElementById('detailPaymentStatus').textContent = statusText;
 
-            // Always show DP breakdown if there are payments
+            // Always show DP breakdown for multiple payments or partial payment
             dpInfoSection.classList.remove('hidden');
             document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
             document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');

@@ -513,22 +513,31 @@
         badge.textContent = finalMethod;
         badge.className = finalMethod === 'Belum Dibayar' ? 'px-3 py-1 rounded-lg text-xs font-black border border-red-200 bg-red-50 text-red-700' : 'px-3 py-1 rounded-lg text-xs font-black border border-green-200 bg-green-50 text-green-700';
 
-        // Payment Status Display
+        // Payment Status Display - Get DP and Pelunasan breakdown
         const paymentStatus = order.payment_status || 'unpaid';
         const paymentSection = document.getElementById('paymentSection');
         const dpInfoSection = document.getElementById('dpInfoSection');
         const totalPrice = Number(order.total_price || 0);
-        const dpAmount = order.payments ? order.payments.reduce((sum, p) => sum + Number(p.amount || 0), 0) : 0;
-        const remainingAmount = totalPrice - dpAmount;
-        const paymentCount = order.payments ? order.payments.length : 0;
+        
+        // Calculate DP and Pelunasan separately
+        const dpAmount = order.payments 
+            ? order.payments.filter(p => p.payment_type === 'dp' || !p.payment_type).reduce((sum, p) => sum + Number(p.amount || 0), 0)
+            : 0;
+        const pelunasanAmount = order.payments
+            ? order.payments.filter(p => p.payment_type === 'pelunasan').reduce((sum, p) => sum + Number(p.amount || 0), 0)
+            : 0;
+        const fullPaymentAmount = order.payments
+            ? order.payments.filter(p => p.payment_type === 'full_payment').reduce((sum, p) => sum + Number(p.amount || 0), 0)
+            : 0;
+        
+        const totalPaid = dpAmount + pelunasanAmount + fullPaymentAmount;
+        const remainingAmount = totalPrice - totalPaid;
+        
+        // Show payment info ONLY if there are DP or multiple payments (not full payment in single transaction)
+        const hasDP = dpAmount > 0;
+        const hasMultiplePayments = (order.payments && order.payments.length > 1);
 
-        // Show payment info ONLY if:
-        // 1. Status is partial (ada sisa pembayaran) OR
-        // 2. Multiple payments exist (ada DP history) - not just single full payment
-        const hasMultiplePayments = paymentCount > 1;
-        const isPartialPayment = paymentStatus === 'partial';
-
-        if ((hasMultiplePayments || isPartialPayment) && order.payments && order.payments.length > 0) {
+        if ((hasDP || (hasMultiplePayments && paymentStatus !== 'unpaid')) && order.payments && order.payments.length > 0) {
             paymentSection.classList.remove('hidden');
             
             // Set payment status text
@@ -540,9 +549,9 @@
             }
             document.getElementById('detailPaymentStatus').textContent = statusText;
 
-            // Always show DP breakdown for multiple payments or partial payment
+            // Show DP breakdown
             dpInfoSection.classList.remove('hidden');
-            document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
+            document.getElementById('detailDPAmount').textContent = 'Rp ' + totalPaid.toLocaleString('id-ID');
             document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');
         } else {
             paymentSection.classList.add('hidden');

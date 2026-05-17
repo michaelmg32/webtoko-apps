@@ -521,8 +521,8 @@
         const dpAmount = order.payments ? order.payments.reduce((sum, p) => sum + Number(p.amount || 0), 0) : 0;
         const remainingAmount = totalPrice - dpAmount;
 
-        // Show payment info if there are any payments recorded
-        if (paymentStatus !== 'unpaid' || (order.payments && order.payments.length > 0)) {
+        // Show payment info ONLY if there are actual payments (ada DP)
+        if (order.payments && order.payments.length > 0) {
             paymentSection.classList.remove('hidden');
             
             // Set payment status text
@@ -534,14 +534,10 @@
             }
             document.getElementById('detailPaymentStatus').textContent = statusText;
 
-            // Show DP info if there are payments
-            if (order.payments && order.payments.length > 0) {
-                dpInfoSection.classList.remove('hidden');
-                document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
-                document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');
-            } else {
-                dpInfoSection.classList.add('hidden');
-            }
+            // Always show DP breakdown if there are payments
+            dpInfoSection.classList.remove('hidden');
+            document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
+            document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');
         } else {
             paymentSection.classList.add('hidden');
         }

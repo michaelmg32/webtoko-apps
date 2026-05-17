@@ -123,20 +123,10 @@
                                         'partial' => 'Bayar Setengah (DP)',
                                         default => 'Belum Dibayar'
                                     };
-                                    
-                                    // Calculate DP amount
-                                    $dpAmount = $order->payments ? $order->payments->sum('amount') : 0;
                                 @endphp
-                                <div class="flex flex-col gap-2">
-                                    <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase {{ $paymentBadge }}">
-                                        {{ $paymentLabel }}
-                                    </span>
-                                    @if($paymentStatus === 'partial' && $dpAmount > 0)
-                                        <span class="px-2 py-1 rounded text-xs font-bold bg-blue-50 text-blue-700">
-                                            DP: Rp {{ number_format($dpAmount, 0, ',', '.') }}
-                                        </span>
-                                    @endif
-                                </div>
+                                <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase {{ $paymentBadge }}">
+                                    {{ $paymentLabel }}
+                                </span>
                             </td>
 
                             <td class="px-6 py-4">
@@ -531,7 +521,8 @@
         const dpAmount = order.payments ? order.payments.reduce((sum, p) => sum + Number(p.amount || 0), 0) : 0;
         const remainingAmount = totalPrice - dpAmount;
 
-        if (paymentStatus !== 'unpaid') {
+        // Show payment info if there are any payments recorded
+        if (paymentStatus !== 'unpaid' || (order.payments && order.payments.length > 0)) {
             paymentSection.classList.remove('hidden');
             
             // Set payment status text
@@ -543,8 +534,8 @@
             }
             document.getElementById('detailPaymentStatus').textContent = statusText;
 
-            // Show DP info if partial payment
-            if (paymentStatus === 'partial' && dpAmount > 0) {
+            // Show DP info if there are payments
+            if (order.payments && order.payments.length > 0) {
                 dpInfoSection.classList.remove('hidden');
                 document.getElementById('detailDPAmount').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
                 document.getElementById('detailRemainingAmount').textContent = 'Rp ' + remainingAmount.toLocaleString('id-ID');

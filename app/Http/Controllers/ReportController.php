@@ -152,6 +152,7 @@ class ReportController extends Controller
                             $paymentByCategory = round($payment->amount * $proportion);
                             
                             $paidOrders->push((object)[
+                                'order_id' => $order->id,
                                 'payment_date' => $payment->payment_date,
                                 'order_code' => $order->order_code,
                                 'customer_name' => $order->customer_name,
@@ -175,6 +176,7 @@ class ReportController extends Controller
                         $priceByCategory = round($order->total_price * $proportion);
                         
                         $paidOrders->push((object)[
+                            'order_id' => $order->id,
                             'payment_date' => $order->created_at,
                             'order_code' => $order->order_code,
                             'customer_name' => $order->customer_name,

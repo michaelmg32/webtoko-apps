@@ -8,7 +8,18 @@
   "background_color": "#ffffff",
   "theme_color": "#22c55e",
   "orientation": "portrait-primary",
+  "prefer_related_applications": false,
   "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
     {
       "src": "/icon-192x192.png",
       "sizes": "192x192",
@@ -34,19 +45,7 @@
       "purpose": "maskable"
     }
   ],
-  "categories": ["productivity", "utilities"],
-  "screenshots": [
-    {
-      "src": "/screenshot-1.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/screenshot-2.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
+  "categories": ["productivity", "utilities"]
+}
   ]
 }

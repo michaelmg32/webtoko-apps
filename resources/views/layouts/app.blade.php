@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="pusher-app-key" content="{{ env('PUSHER_APP_KEY') }}">
+    <meta name="pusher-cluster" content="{{ env('PUSHER_APP_CLUSTER') }}">
     <title>@yield('title', 'Studio Presisi')</title>
     
     <!-- Web App Meta Tags -->

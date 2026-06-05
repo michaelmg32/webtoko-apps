@@ -1,7 +1,5 @@
 const CACHE_NAME = 'bukit-foto-v1';
 const urlsToCache = [
-  '/',
-  '/index.php',
   '/favicon.ico',
   '/icon-192x192.png',
   '/icon-512x512.png'

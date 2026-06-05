@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bukit-foto-v1';
+const CACHE_NAME = 'bukit-foto-v2';
 const urlsToCache = [
   '/favicon.ico',
   '/bukitfoto.png'
@@ -19,11 +19,22 @@ self.addEventListener('install', event => {
 
 // Fetch event
 self.addEventListener('fetch', event => {
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
+  // Skip cross-origin requests and non-GET requests
+  if (!event.request.url.startsWith(self.location.origin) || event.request.method !== 'GET') {
     return;
   }
 
+  // Handle navigation requests (HTML pages) directly from network
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match('/favicon.ico'); // Just a fallback
+      })
+    );
+    return;
+  }
+
+  // For static assets, try cache first, then network
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -31,18 +42,17 @@ self.addEventListener('fetch', event => {
           return response;
         }
         return fetch(event.request).then(response => {
-          // Clone the response
+          // Only cache valid 200 responses that are not redirected
+          if (!response || response.status !== 200 || response.type !== 'basic' || response.redirected) {
+            return response;
+          }
           const clonedResponse = response.clone();
           caches.open(CACHE_NAME)
             .then(cache => {
               cache.put(event.request, clonedResponse);
             });
           return response;
-        });
-      })
-      .catch(() => {
-        // Return offline page or cached response
-        return caches.match('/');
+        }).catch(() => null);
       })
   );
 });

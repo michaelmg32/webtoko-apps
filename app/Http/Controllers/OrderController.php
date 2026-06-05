@@ -43,6 +43,8 @@ class OrderController extends Controller
             'changed_by' => auth()->id()
         ]);
 
+        event(new \App\Events\OrderStatusUpdated($order));
+
         return redirect('/penerima/orders')->with('success', 'Barang berhasil ditandai sebagai sudah diambil');
     }
 
@@ -188,6 +190,8 @@ class OrderController extends Controller
             ]);
 
             DB::commit();
+
+            event(new \App\Events\OrderCreated($order));
 
             return redirect()->route('orderstatus.index')->with('success', 'Order berhasil dibuat! Total: Rp ' . number_format($total, 0, ',', '.'));
         } catch (\Exception $e) {

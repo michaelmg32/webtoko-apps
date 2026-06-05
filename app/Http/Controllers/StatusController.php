@@ -71,6 +71,8 @@ class StatusController extends Controller
             'changed_by' => Auth::id()
         ]);
 
+        event(new \App\Events\OrderStatusUpdated($order));
+
         return redirect()->route('operator.orders.index')->with('success', 'Order ' . $order->order_code . ' berhasil ditandai sebagai sudah dicetak!');
     }
 
@@ -103,6 +105,8 @@ class StatusController extends Controller
             'changed_by' => Auth::id()
         ]);
 
+        event(new \App\Events\OrderStatusUpdated($order));
+
         return back();
     }
 
@@ -128,6 +132,8 @@ class StatusController extends Controller
                 'new_status' => $validated['pickup_status'],
                 'changed_by' => Auth::id()
             ]);
+
+            event(new \App\Events\OrderStatusUpdated($order));
 
             return response()->json([
                 'success' => true,

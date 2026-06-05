@@ -12,7 +12,7 @@
             <div class="p-6 border-b border-gray-100 bg-gray-50/50">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-2xl font-bold text-gray-800">Pembayaran Pesanan</h2>
-                    <span class="bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold text-sm">
+                    <span id="pendingCounter" class="bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold text-sm">
                         {{ count($orders) }} PENDING
                     </span>
                 </div>
@@ -41,7 +41,7 @@
             </div>
 
             <!-- Orders List -->
-            <div class="divide-y divide-gray-100">
+            <div id="ordersListContainer" class="divide-y divide-gray-100">
                 @forelse($orders as $order)
                     <div class="order-item p-6 border-l-4 hover:bg-gray-50 cursor-pointer transition"
                         data-order-id="{{ $order->id }}"
@@ -1320,6 +1320,46 @@ function applyTimePeriodFilter() {
     window.location = url.toString();
 }
 
+// --- REAL-TIME UPDATES VIA LARAVEL ECHO ---
+if (typeof window.Echo !== 'undefined') {
+    window.Echo.channel('orders')
+        .listen('.order.created', (e) => {
+            if (typeof showNotification === 'function') {
+                showNotification('Pesanan baru masuk: ' + (e.order.order_code || '-'), 'info');
+            }
+            silentlyReloadOrdersList();
+        })
+        .listen('.order.updated', (e) => {
+            silentlyReloadOrdersList();
+        });
+}
+
+function silentlyReloadOrdersList() {
+    fetch(window.location.href)
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Update Orders List Container
+            const currentList = document.getElementById('ordersListContainer');
+            const newList = doc.getElementById('ordersListContainer');
+            if (currentList && newList) {
+                currentList.innerHTML = newList.innerHTML;
+            }
+            
+            // Update Pending Counter
+            const currentCounter = document.getElementById('pendingCounter');
+            const newCounter = doc.getElementById('pendingCounter');
+            if (currentCounter && newCounter) {
+                currentCounter.innerHTML = newCounter.innerHTML;
+            }
+            
+            // Re-apply filter
+            filterOrders(currentFilterType);
+        })
+        .catch(err => console.error('Error reloading orders list:', err));
+}
 </script>
 
 <style>

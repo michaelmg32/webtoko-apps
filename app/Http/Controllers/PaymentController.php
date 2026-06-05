@@ -49,6 +49,8 @@ class PaymentController extends Controller
             'changed_by' => auth()->id()
         ]);
 
+        event(new \App\Events\OrderStatusUpdated($order));
+
         $methodLabel = match($request->method) {
             'cash' => 'Cash',
             'transfer' => 'Transfer',
@@ -88,11 +90,14 @@ class PaymentController extends Controller
                 'changed_by' => auth()->id()
             ]);
 
+            $order = Order::find($validated['order_id']);
+            event(new \App\Events\OrderStatusUpdated($order));
+
             return response()->json([
                 'success' => true,
                 'message' => 'DP pembayaran berhasil dicatat',
                 'payment' => $payment,
-                'order' => Order::find($validated['order_id'])
+                'order' => $order
             ]);
 
         } catch (Exception $e) {
@@ -135,11 +140,14 @@ class PaymentController extends Controller
                 'changed_by' => auth()->id()
             ]);
 
+            $order = $order->fresh();
+            event(new \App\Events\OrderStatusUpdated($order));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Pelunasan berhasil dicatat',
                 'payment' => $payment,
-                'order' => $order->fresh()
+                'order' => $order
             ]);
 
         } catch (Exception $e) {

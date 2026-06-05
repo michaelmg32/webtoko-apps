@@ -715,5 +715,47 @@
         url.searchParams.set('period', timePeriod);
         window.location = url.toString();
     }
+
+    // --- REAL-TIME UPDATES VIA LARAVEL ECHO ---
+    if (typeof window.Echo !== 'undefined') {
+        window.Echo.channel('orders')
+            .listen('.order.created', (e) => {
+                showNotification('Pesanan baru diterima: ' + (e.order.order_code || '-'), 'info');
+                silentlyReloadTable();
+            })
+            .listen('.order.updated', (e) => {
+                // showNotification('Pembaruan pesanan: ' + (e.order.order_code || '-'), 'info');
+                silentlyReloadTable();
+            });
+    }
+
+    function silentlyReloadTable() {
+        fetch(window.location.href)
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Update Table Body
+                const currentTable = document.getElementById('tableBody');
+                const newTable = doc.getElementById('tableBody');
+                if (currentTable && newTable) {
+                    currentTable.innerHTML = newTable.innerHTML;
+                }
+                
+                // Update Counters
+                const currentCounters = document.querySelectorAll('.status-card-btn .text-3xl');
+                const newCounters = doc.querySelectorAll('.status-card-btn .text-3xl');
+                if(currentCounters.length === newCounters.length) {
+                    for(let i=0; i<currentCounters.length; i++) {
+                        currentCounters[i].innerHTML = newCounters[i].innerHTML;
+                    }
+                }
+                
+                // Re-apply filters
+                filterTable();
+            })
+            .catch(err => console.error('Error reloading table:', err));
+    }
 </script>
 @endsection

@@ -618,11 +618,17 @@
             headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 'Content-Type': 'application/json'},
             body: JSON.stringify({ password: password })
         })
-        .then(r => r.json())
-        .then(data => {
+        .then(async r => {
+            if (r.status === 419) {
+                showNotification('Sesi telah kedaluwarsa. Memuat ulang halaman...', 'warning');
+                setTimeout(() => window.location.reload(), 1500);
+                throw new Error('CSRF Token Expired');
+            }
+            const data = await r.json();
             if (!data.success) { errorMsg.textContent = data.message; errorMsg.classList.remove('hidden'); return; }
             location.reload();
-        });
+        })
+        .catch(err => console.error('Void Error:', err));
     }
 
     function filterTable() {

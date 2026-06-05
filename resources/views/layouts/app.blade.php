@@ -244,7 +244,7 @@
             <div class="flex-1 overflow-y-auto p-4 lg:p-8">
                 <div class="max-w-7xl mx-auto">
                     @if($errors->any() || session('success'))
-                        <div class="mb-6 space-y-2">
+                        <div id="flashMessageContainer" class="mb-6 space-y-2 transition-soft">
                             @if($errors->any())
                                 <div class="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm font-medium shadow-sm">
                                     <i class="fas fa-circle-exclamation"></i>
@@ -381,6 +381,18 @@
         document.getElementById('confirmBtn').addEventListener('click', () => {
             if (window.confirmCallback) window.confirmCallback();
             closeConfirmModal();
+        });
+
+        // Auto-hide flash messages
+        window.addEventListener('DOMContentLoaded', () => {
+            const flashContainer = document.getElementById('flashMessageContainer');
+            if (flashContainer) {
+                setTimeout(() => {
+                    flashContainer.style.opacity = '0';
+                    flashContainer.style.transform = 'translateY(-10px)';
+                    setTimeout(() => flashContainer.remove(), 500);
+                }, 4000);
+            }
         });
     </script>
 

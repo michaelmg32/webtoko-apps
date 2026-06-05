@@ -22,7 +22,7 @@
                     <button onclick="filterOrders('unpaid')" class="filter-btn active px-4 py-2 rounded-xl text-sm font-bold border border-red-500 bg-red-50 text-red-700 transition-all" data-filter="unpaid">
                         <i class="fas fa-times-circle"></i> Belum Bayar
                     </button>
-                    <button onclick="filterOrders('partial')" class="filter-btn px-4 py-2 rounded-xl text-sm font-bold border border-gray-200 text-gray-700 hover:border-yellow-500 hover:bg-yellow-50 transition-all" data-filter="partial"
+                    <button onclick="filterOrders('partial')" class="filter-btn px-4 py-2 rounded-xl text-sm font-bold border border-gray-200 text-gray-700 hover:border-yellow-500 hover:bg-yellow-50 transition-all" data-filter="partial">
                         <i class="fas fa-check"></i> Sudah DP
                     </button>
                 </div>

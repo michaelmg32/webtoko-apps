@@ -22,8 +22,8 @@
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     
     <!-- PWA Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icon-192x192.png') }}">
-    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('icon-512x512.png') }}">
+    <link rel="icon" type="image/png" sizes="any" href="{{ asset('bukitfoto.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('bukitfoto.png') }}">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

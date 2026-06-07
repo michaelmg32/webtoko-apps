@@ -4,9 +4,9 @@
 @section('page-title', 'Halaman Pembayaran')
 
 @section('content')
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- LEFT SIDE: UNPAID ORDERS LIST -->
-    <div class="col-span-2">
+    <div class="lg:col-span-2">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
             <!-- Header -->
             <div class="p-6 border-b border-gray-100 bg-gray-50/50">
@@ -18,7 +18,7 @@
                 </div>
                 
                 <!-- Filter Buttons -->
-                <div class="flex gap-2 mt-4 mb-4">
+                <div class="flex flex-wrap gap-2 mt-4 mb-4">
                     <button onclick="filterOrders('unpaid')" class="filter-btn active px-4 py-2 rounded-xl text-sm font-bold border border-red-500 bg-red-50 text-red-700 transition-all" data-filter="unpaid">
                         <i class="fas fa-times-circle"></i> Belum Bayar
                     </button>

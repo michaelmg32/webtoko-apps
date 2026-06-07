@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         @forelse($products as $product)
                             @php
                                 $categoryType = in_array(strtolower($product->category ?? ''), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($product->category ?? ''), ['goods', 'barang']) ? 'barang' : (strtolower($product->category ?? '') === 'studio' ? 'studio' : 'all'));

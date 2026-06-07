@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Bukit Foto Studio</title>
+    <meta name="description" content="Sistem Manajemen Internal Bukit Foto Studio. Silakan masuk dengan akun staf Anda untuk mengelola pesanan, kasir, dan antrean cetak.">
+    <meta name="robots" content="index, follow">
     
     <!-- PWA Icons -->
     <link rel="icon" type="image/png" sizes="any" href="{{ asset('bukitfoto.png') }}">

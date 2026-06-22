@@ -210,6 +210,17 @@ class ReportController extends Controller
             });
         }
 
+        // Apply search query if provided
+        $search = request('search');
+        if ($search) {
+            $paidOrders = $paidOrders->filter(function($order) use ($search) {
+                $orderCode = $order->order_code ?? '';
+                $customerName = $order->customer_name ?? '';
+                return (strpos(strtolower($orderCode), strtolower($search)) !== false) ||
+                       (strpos(strtolower($customerName), strtolower($search)) !== false);
+            });
+        }
+
         $recentOrders = $paidOrders;
 
         return view('admin.reports', [

@@ -150,7 +150,18 @@
             <form id="autoFilterForm" method="GET" action="{{ route('admin.reports.index') }}">
                 <input type="hidden" name="period" value="{{ $period }}">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 items-end">
+                    <div class="lg:col-span-2">
+                        <label for="search" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Search</label>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="search" name="search" 
+                                   value="{{ request('search') }}"
+                                   placeholder="Cari order code atau nama..."
+                                   class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
+                        </div>
+                    </div>
+
                     <div class="lg:col-span-1">
                         <label for="filter_start_date" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Start Date</label>
                         <input type="date" id="filter_start_date" name="filter_start_date" 
@@ -168,7 +179,7 @@
                     <div class="lg:col-span-1">
                         <label for="filter_category" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Category</label>
                         <select id="filter_category" name="filter_category" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
-                            <option value="">All Categories</option>
+                            <option value="">All</option>
                             <option value="cetak" {{ request('filter_category') === 'cetak' ? 'selected' : '' }}>Cetak</option>
                             <option value="studio" {{ request('filter_category') === 'studio' ? 'selected' : '' }}>Studio</option>
                             <option value="barang" {{ request('filter_category') === 'barang' ? 'selected' : '' }}>Barang</option>
@@ -178,7 +189,7 @@
                     <div class="lg:col-span-1">
                         <label for="filter_payment_method" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Method</label>
                         <select id="filter_payment_method" name="filter_payment_method" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
-                            <option value="">All Methods</option>
+                            <option value="">All</option>
                             <option value="cash" {{ request('filter_payment_method') === 'cash' ? 'selected' : '' }}>Cash</option>
                             <option value="transfer" {{ request('filter_payment_method') === 'transfer' ? 'selected' : '' }}>Transfer</option>
                         </select>
@@ -196,12 +207,23 @@
                 document.addEventListener('DOMContentLoaded', function() {
                     const filterForm = document.getElementById('autoFilterForm');
                     const filterInputs = filterForm.querySelectorAll('input[type="date"], select');
+                    const searchInput = document.getElementById('search');
+                    let timeout = null;
                     
                     filterInputs.forEach(input => {
                         input.addEventListener('change', function() {
                             filterForm.submit();
                         });
                     });
+
+                    if (searchInput) {
+                        searchInput.addEventListener('keyup', function(e) {
+                            clearTimeout(timeout);
+                            timeout = setTimeout(function() {
+                                filterForm.submit();
+                            }, 500);
+                        });
+                    }
                 });
             </script>
         </div>

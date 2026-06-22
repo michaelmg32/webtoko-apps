@@ -47,7 +47,7 @@
         </div>
     </div>
 
-    <div id="productListContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div id="productListContainer" class="flex flex-col gap-3">
         @forelse($products as $product)
             @php
                 $categoryKey = in_array(strtolower($product->category), ['print', 'cetak']) ? 'cetak' : (in_array(strtolower($product->category), ['goods', 'barang']) ? 'barang' : strtolower($product->category));
@@ -71,66 +71,53 @@
                 };
             @endphp
             
-            <div class="product-row bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group relative flex flex-col h-full"
+            <div class="product-row bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all duration-300 group flex flex-col sm:flex-row items-center p-4 gap-4"
                 data-product-id="{{ $product->id }}"
                 data-category="{{ $categoryKey }}"
                 data-name="{{ strtolower($product->name) }}"
                 data-sku="{{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}">
                 
-                <!-- Image Placeholder Header -->
-                <div class="bg-gradient-to-br {{ $categoryBg }} h-32 flex items-center justify-center relative overflow-hidden group">
-                    <div class="absolute inset-0 opacity-10">
-                        <i class="fas {{ $categoryIcon }} text-9xl text-white absolute -right-8 -top-8 transform rotate-12"></i>
-                    </div>
-                    <i class="fas {{ $categoryIcon }} text-6xl text-white/80 relative z-10 group-hover:scale-110 transition-transform"></i>
+                <!-- Icon/Avatar -->
+                <div class="w-16 h-16 rounded-xl bg-gradient-to-br {{ $categoryBg }} flex items-center justify-center flex-shrink-0 relative overflow-hidden shadow-sm">
+                    <i class="fas {{ $categoryIcon }} text-2xl text-white/90 group-hover:scale-110 transition-transform"></i>
                     
-                    <!-- Category Badge -->
-                    <span class="absolute top-3 right-3 bg-white text-gray-900 text-xs font-black px-3 py-1.5 rounded-full shadow-lg">
-                        {{ $categoryLabel }}
-                    </span>
-                    
-                    <!-- Stock Indicator -->
-                    <div class="absolute bottom-3 left-3 flex items-center gap-1 bg-white/95 px-2.5 py-1 rounded-full shadow-sm">
-                        <div class="w-2 h-2 {{ $product->unlimited_stock ? 'bg-green-500' : ($product->stock > 0 ? 'bg-yellow-500' : 'bg-red-500') }} rounded-full"></div>
-                        <span class="text-xs font-bold text-gray-700">
-                            {{ $product->unlimited_stock ? '∞' : $product->stock ?? 0 }}
-                        </span>
-                    </div>
+                    <!-- Stock Indicator Dot -->
+                    <div class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full border-2 border-white {{ $product->unlimited_stock ? 'bg-green-500' : ($product->stock > 0 ? 'bg-yellow-500' : 'bg-red-500') }}" title="Stock: {{ $product->unlimited_stock ? '∞' : $product->stock ?? 0 }}"></div>
                 </div>
 
-                <!-- Content -->
-                <div class="p-4 flex-1 flex flex-col gap-3">
-                    <!-- Product Name -->
-                    <div>
-                        <h4 class="font-black text-gray-900 text-base group-hover:text-blue-600 transition-colors line-clamp-2 product-name">
+                <!-- Product Details -->
+                <div class="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 w-full">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-900 text-base truncate group-hover:text-blue-600 transition-colors product-name">
                             {{ $product->name }}
                         </h4>
-                        <p class="text-xs text-gray-500 mt-2 font-mono font-bold product-sku">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</p>
+                        <div class="flex items-center gap-3 mt-1">
+                            <span class="text-xs text-gray-500 font-mono font-bold product-sku">SKU: {{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</span>
+                            <span class="bg-gray-100 text-gray-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">{{ $categoryLabel }}</span>
+                            <span class="text-[10px] font-bold {{ $product->unlimited_stock ? 'text-green-600' : ($product->stock > 0 ? 'text-yellow-600' : 'text-red-600') }}">
+                                {{ $product->unlimited_stock ? 'Stok Tidak Terbatas' : 'Stok: ' . ($product->stock ?? 0) }}
+                            </span>
+                        </div>
                     </div>
 
-                    <!-- Divider -->
-                    <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-
                     <!-- Price -->
-                    <div class="space-y-1">
-                        <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Harga Utama</p>
-                        <p class="font-black text-lg text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                    <div class="sm:text-right mt-2 sm:mt-0 bg-gray-50 sm:bg-transparent p-2 sm:p-0 rounded-lg">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5 hidden sm:block">Harga Utama</p>
+                        <p class="font-black text-base text-gray-900 whitespace-nowrap">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="bg-gray-50 border-t border-gray-100 p-3 grid grid-cols-2 gap-2">
+                <div class="flex items-center gap-2 mt-3 sm:mt-0 w-full sm:w-auto justify-end pt-3 sm:pt-0 border-t border-gray-100 sm:border-0">
                     <a href="{{ route('admin.products.edit', $product->id) }}" 
-                       class="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all font-bold text-xs shadow-sm active:scale-95">
+                       class="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95" title="Edit">
                         <i class="fas fa-edit"></i>
-                        <span>Edit</span>
                     </a>
                     <button type="button" 
-                       class="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all font-bold text-xs shadow-sm active:scale-95" 
+                       class="flex items-center justify-center w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95" 
                        onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')"
                        title="Hapus Produk">
                         <i class="fas fa-trash"></i>
-                        <span>Hapus</span>
                     </button>
                 </div>
             </div>

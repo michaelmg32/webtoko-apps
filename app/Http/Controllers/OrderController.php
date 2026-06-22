@@ -119,7 +119,7 @@ class OrderController extends Controller
 
             $request->validate([
                 'customer_name' => 'required|string|max:255',
-                'customer_phone' => 'required|string|max:20',
+                'customer_phone' => 'nullable|string|max:20',
                 'discount_amount' => 'nullable|numeric|min:0'
             ]);
 

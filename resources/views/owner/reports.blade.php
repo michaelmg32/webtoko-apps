@@ -371,10 +371,6 @@
                     <span id="detailCreator" class="text-slate-800 font-bold text-sm">-</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span class="text-slate-500 font-bold text-sm">Waktu Pengambilan</span>
-                    <span id="detailPickupTime" class="text-slate-800 font-bold text-sm">-</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-slate-100">
                     <span class="text-slate-500 font-bold text-sm">Total Harga</span>
                     <span id="detailAmount" class="text-2xl font-black text-green-600">-</span>
                 </div>

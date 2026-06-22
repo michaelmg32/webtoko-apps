@@ -26,14 +26,14 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'role' => 'required|in:admin,kasir,penerima,operator_cetak'
+            'role' => 'required|in:owner,admin,kasir,penerima,operator_cetak'
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
         User::create($validated);
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil dibuat');
+        return redirect()->route('owner.users.index')->with('success', 'Akun pengguna berhasil dibuat');
     }
 
     public function edit(User $user)
@@ -47,7 +47,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:admin,kasir,penerima,operator_cetak',
+            'role' => 'required|in:owner,admin,kasir,penerima,operator_cetak',
             'password' => 'nullable|min:6'
         ]);
 
@@ -59,14 +59,14 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil diperbarui');
+        return redirect()->route('owner.users.index')->with('success', 'Akun pengguna berhasil diperbarui');
     }
 
     public function destroy(User $user)
     {
-        // Prevent deleting the only admin
-        if ($user->role === 'admin' && User::where('role', 'admin')->count() === 1) {
-            return back()->with('error', 'Tidak bisa menghapus satu-satunya admin');
+        // Prevent deleting the only owner
+        if ($user->role === 'owner' && User::where('role', 'owner')->count() === 1) {
+            return back()->with('error', 'Tidak bisa menghapus satu-satunya owner');
         }
 
         // Set changed_by to NULL for related order status logs instead of deleting them
@@ -77,6 +77,6 @@ class UserController extends Controller
         \App\Models\Payment::where('paid_by', $user->id)->update(['paid_by' => null]);
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil dihapus');
+        return redirect()->route('owner.users.index')->with('success', 'Akun pengguna berhasil dihapus');
     }
 }

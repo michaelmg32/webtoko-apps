@@ -180,7 +180,7 @@ class StatusController extends Controller
     public function getOrder($id)
     {
         try {
-            $order = Order::with('items.product', 'payments', 'customer')->findOrFail($id);
+            $order = Order::with('items.product', 'payments', 'customer', 'creator')->findOrFail($id);
             
             return response()->json([
                 'success' => true,

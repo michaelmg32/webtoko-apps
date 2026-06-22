@@ -231,6 +231,10 @@
                     <span id="detailDate" class="text-slate-800 font-bold text-sm">-</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold text-sm">Dibuat Oleh</span>
+                    <span id="detailCreator" class="text-slate-800 font-bold text-sm">-</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-slate-100">
                     <span class="text-slate-500 font-bold text-sm">Waktu Pengambilan</span>
                     <span id="detailPickupTime" class="text-slate-800 font-bold text-sm">-</span>
                 </div>
@@ -501,6 +505,7 @@
         document.getElementById('detailCustomer').textContent = order.customer_name || (order.customer ? order.customer.name : '-');
         document.getElementById('detailOrderCode').textContent = order.order_code || order.code;
         document.getElementById('detailPhone').textContent = order.customer_phone || (order.customer ? order.customer.phone : '-');
+        document.getElementById('detailCreator').textContent = order.creator ? order.creator.name : '-';
         document.getElementById('detailAmount').textContent = 'Rp ' + Number(order.total_price).toLocaleString('id-ID');
         document.getElementById('detailDate').textContent = order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '-';
 

@@ -62,11 +62,20 @@
                         </div>
                     </div>
 
-                    <div class="group max-w-md">
-                        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-indigo-500 transition-colors">Password Baru (Opsional)</label>
-                        <input type="password" name="password"
-                            placeholder="Biarkan kosong jika tidak ingin mengubah password"
-                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all outline-none text-gray-700 text-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-indigo-500 transition-colors">Password Lama</label>
+                            <input type="password" name="old_password"
+                                placeholder="Wajib diisi jika ingin ubah password..."
+                                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all outline-none text-gray-700 text-sm">
+                        </div>
+
+                        <div class="group">
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-indigo-500 transition-colors">Password Baru (Opsional)</label>
+                            <input type="password" name="password"
+                                placeholder="Biarkan kosong jika tidak ingin mengubah"
+                                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all outline-none text-gray-700 text-sm">
+                        </div>
                     </div>
                 </div>
 

@@ -53,8 +53,8 @@
                 <div class="flex-1 w-full">
                     <div class="relative">
                         <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="searchInput" placeholder="Cari berdasarkan kode order, nama pelanggan..." 
-                            autocomplete="off"
+                        <input type="search" id="searchInput" placeholder="Cari berdasarkan kode order, nama pelanggan..." 
+                            autocomplete="new-password"
                             class="w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none text-sm font-medium">
                     </div>
                 </div>
@@ -338,7 +338,7 @@
         
         <div class="mb-6">
             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Kata Sandi Admin</label>
-            <input type="password" id="voidPasswordInput" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none font-bold" placeholder="••••••••">
+            <input type="password" id="voidPasswordInput" autocomplete="new-password" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none font-bold" placeholder="••••••••">
             <p id="voidErrorMsg" class="text-xs text-red-600 mt-2 font-bold hidden"></p>
         </div>
 

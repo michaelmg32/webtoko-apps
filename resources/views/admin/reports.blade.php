@@ -155,10 +155,10 @@
                         <label for="search" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Search</label>
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="search" name="search" 
+                            <input type="search" id="search" name="search" 
                                    value="{{ request('search') }}"
                                    placeholder="Cari order code atau nama..."
-                                   autocomplete="off"
+                                   autocomplete="new-password"
                                    class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
                         </div>
                     </div>

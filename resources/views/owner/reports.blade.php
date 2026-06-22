@@ -408,6 +408,9 @@
         </div>
 
         <div class="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+            <a id="detailPrintBtn" href="#" target="_blank" class="flex-1 py-3.5 bg-emerald-600 text-white rounded-2xl font-black text-sm hover:bg-emerald-700 transition-all text-center flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
+                <i class="fas fa-print"></i> CETAK STRUK
+            </a>
             <button onclick="closeDetailModal()" class="flex-1 py-3.5 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-slate-800 transition-all">
                 TUTUP
             </button>
@@ -534,6 +537,9 @@
         } else {
             notesSection.classList.add('hidden');
         }
+
+        // Set Print Button Link
+        document.getElementById('detailPrintBtn').href = `/orders/${order.id}/receipt`;
 
         document.getElementById('detailModal').classList.remove('hidden');
     }

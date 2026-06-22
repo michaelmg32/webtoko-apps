@@ -150,7 +150,7 @@
             <form id="autoFilterForm" method="GET" action="{{ route('admin.reports.index') }}">
                 <input type="hidden" name="period" value="{{ $period }}">
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 items-end">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
                     <div class="lg:col-span-2">
                         <label for="search" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Search</label>
                         <div class="relative">
@@ -194,12 +194,6 @@
                             <option value="cash" {{ request('filter_payment_method') === 'cash' ? 'selected' : '' }}>Cash</option>
                             <option value="transfer" {{ request('filter_payment_method') === 'transfer' ? 'selected' : '' }}>Transfer</option>
                         </select>
-                    </div>
-
-                    <div class="lg:col-span-1">
-                        <a href="{{ route('admin.reports.index', ['period' => $period]) }}" class="w-full px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center" title="Reset Filters">
-                            <i class="fas fa-redo text-xs"></i>
-                        </a>
                     </div>
                 </div>
             </form>

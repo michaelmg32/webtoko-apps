@@ -46,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
     PENERIMA KONSUMEN
     =========================
     */
-    Route::middleware(['role:penerima'])->prefix('penerima')->name('penerima.')->group(function () {
+    Route::middleware(['role:penerima,admin,owner'])->prefix('penerima')->name('penerima.')->group(function () {
         Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     });
@@ -56,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
     KASIR
     =========================
     */
-    Route::middleware(['role:kasir'])->prefix('kasir')->name('kasir.')->group(function () {
+    Route::middleware(['role:kasir,admin,owner'])->prefix('kasir')->name('kasir.')->group(function () {
         Route::get('/orders', [OrderController::class, 'unpaid'])->name('orders.index');
         Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('/pay', [PaymentController::class, 'pay'])->name('pay');
@@ -66,8 +66,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/payment/pelunasan', [PaymentController::class, 'recordPelunasan'])->name('payment.pelunasan');
         Route::get('/payment/{orderId}/detail', [PaymentController::class, 'getPaymentDetail'])->name('payment.detail');
         
-        // Financial Reports (Moved to admin/reports with ARUS KAS tab)
-        // Route::get('/reports/daily', [PaymentController::class, 'dailyReport'])->name('reports.daily');
         Route::get('/reports/payment-method', [PaymentController::class, 'paymentMethodReport'])->name('reports.method');
         Route::get('/reports/outstanding-dp', [PaymentController::class, 'outstandingDPReport'])->name('reports.outstanding');
         Route::get('/reports/dp-vs-pelunasan', [PaymentController::class, 'dpvsPelunasanReport'])->name('reports.dpvspelunasan');
@@ -78,7 +76,7 @@ Route::middleware(['auth'])->group(function () {
     OPERATOR CETAK
     =========================
     */
-    Route::middleware(['role:operator_cetak'])->prefix('operator')->name('operator.')->group(function () {
+    Route::middleware(['role:operator_cetak,admin,owner'])->prefix('operator')->name('operator.')->group(function () {
         Route::get('/orders', [OrderController::class, 'readyToPrint'])->name('orders.index');
         Route::post('/print/{id}', [StatusController::class, 'markPrinted'])->name('orders.print');
     });
@@ -93,10 +91,10 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     =========================
-    ADMIN - AKSES SEMUA ROLE + MENU ADMIN
+    ADMIN & OWNER PANEL
     =========================
     */
-    Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:admin,owner'])->prefix('admin')->name('admin.')->group(function () {
         // Penerima access
         Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
         
@@ -109,25 +107,34 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/payment/pelunasan', [PaymentController::class, 'recordPelunasan'])->name('payment.pelunasan');
         Route::get('/payment/{orderId}/detail', [PaymentController::class, 'getPaymentDetail'])->name('payment.detail');
         
-        // Financial Reports
-        Route::get('/reports/daily', [PaymentController::class, 'dailyReport'])->name('reports.daily');
-        Route::get('/reports/payment-method', [PaymentController::class, 'paymentMethodReport'])->name('reports.method');
-        Route::get('/reports/outstanding-dp', [PaymentController::class, 'outstandingDPReport'])->name('reports.outstanding');
-        Route::get('/reports/dp-vs-pelunasan', [PaymentController::class, 'dpvsPelunasanReport'])->name('reports.dpvspelunasan');
-        
         // Operator access
         Route::post('/print/{id}', [StatusController::class, 'markPrinted'])->name('orders.print');
         
-        // Admin specific
-        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/income', [ReportController::class, 'income'])->name('reports.income');
-        Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
+        // Admin & Owner specific (Products)
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
         Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+    });
+
+    /*
+    =========================
+    OWNER ONLY PANEL (Reports & Staff)
+    =========================
+    */
+    Route::middleware(['role:owner'])->prefix('owner')->name('owner.')->group(function () {
+        // Financial Reports
+        Route::get('/reports/daily', [PaymentController::class, 'dailyReport'])->name('reports.daily');
+        Route::get('/reports/payment-method', [PaymentController::class, 'paymentMethodReport'])->name('reports.method');
+        Route::get('/reports/outstanding-dp', [PaymentController::class, 'outstandingDPReport'])->name('reports.outstanding');
+        Route::get('/reports/dp-vs-pelunasan', [PaymentController::class, 'dpvsPelunasanReport'])->name('reports.dpvspelunasan');
+        
+        // Laporan
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/income', [ReportController::class, 'income'])->name('reports.income');
+        Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
         
         // User Management
         Route::get('/users', [UserController::class, 'index'])->name('users.index');

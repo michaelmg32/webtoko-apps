@@ -22,8 +22,8 @@ class RoleMiddleware
             abort(403, 'Unauthorized');
         }
 
-        // Admin dapat mengakses semua route
-        if ($user->role === 'admin') {
+        // Owner dapat mengakses semua route
+        if ($user->role === 'owner') {
             return $next($request);
         }
 

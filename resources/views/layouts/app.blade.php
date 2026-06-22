@@ -144,7 +144,7 @@
                     <span class="sidebar-text">Menu Utama</span>
                 </p>
                 
-                @if(auth()->user()->role === 'penerima' || auth()->user()->role === 'admin')
+                @if(in_array(auth()->user()->role, ['penerima', 'admin', 'owner']))
                     <a href="{{ route('penerima.orders.create') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-soft group {{ request()->is('*/orders/create') ? 'sidebar-item-active' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <i class="fas fa-plus-circle text-lg flex-shrink-0"></i>
@@ -158,7 +158,7 @@
                     <span class="sidebar-text text-sm font-medium">Status Pesanan</span>
                 </a>
 
-                @if(auth()->user()->role === 'kasir' || auth()->user()->role === 'admin')
+                @if(in_array(auth()->user()->role, ['kasir', 'admin', 'owner']))
                     <a href="{{ route('kasir.orders.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-soft group {{ request()->is('kasir/orders*') ? 'sidebar-item-active' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <i class="fas fa-wallet text-lg flex-shrink-0"></i>
@@ -166,7 +166,7 @@
                     </a>
                 @endif
 
-                @if(auth()->user()->role === 'operator_cetak' || auth()->user()->role === 'admin')
+                @if(in_array(auth()->user()->role, ['operator_cetak', 'admin', 'owner']))
                     <a href="{{ route('operator.orders.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-soft group {{ request()->is('operator*') ? 'sidebar-item-active' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <i class="fas fa-print text-lg flex-shrink-0"></i>
@@ -174,7 +174,7 @@
                     </a>
                 @endif
 
-                @if(auth()->user()->role === 'admin')
+                @if(in_array(auth()->user()->role, ['admin', 'owner']))
                     <div class="mt-8 pt-6 border-t border-slate-800">
                         <p class="sidebar-section-label flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-500 mb-4 uppercase tracking-[0.15em]">
                             <i class="fas fa-sliders-h text-sm flex-shrink-0"></i>
@@ -186,15 +186,17 @@
                             <span class="sidebar-text text-sm font-medium">Data Produk</span>
                         </a>
 
-                        <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-soft {{ request()->is('admin/reports*') ? 'sidebar-item-active' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                            <i class="fas fa-chart-line text-lg flex-shrink-0"></i>
-                            <span class="sidebar-text text-sm font-medium">Laporan</span>
-                        </a>
+                        @if(auth()->user()->role === 'owner')
+                            <a href="{{ route('owner.reports.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-soft {{ request()->is('owner/reports*') ? 'sidebar-item-active' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                                <i class="fas fa-chart-line text-lg flex-shrink-0"></i>
+                                <span class="sidebar-text text-sm font-medium">Laporan</span>
+                            </a>
 
-                        <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-soft {{ request()->is('admin/users*') ? 'sidebar-item-active' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                            <i class="fas fa-users-cog text-lg flex-shrink-0"></i>
-                            <span class="sidebar-text text-sm font-medium">Kelola Staff</span>
-                        </a>
+                            <a href="{{ route('owner.users.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-soft {{ request()->is('owner/users*') ? 'sidebar-item-active' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                                <i class="fas fa-users-cog text-lg flex-shrink-0"></i>
+                                <span class="sidebar-text text-sm font-medium">Kelola Staff</span>
+                            </a>
+                        @endif
                     </div>
                 @endif
             </nav>

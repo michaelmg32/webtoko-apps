@@ -24,15 +24,15 @@
             </div>
             
             <div class="flex gap-2 overflow-x-auto border-b border-gray-100 no-scrollbar">
-                <a href="{{ route('admin.reports.index', ['period' => 'daily']) }}" 
+                <a href="{{ route('owner.reports.index', ['period' => 'daily']) }}" 
                    class="px-6 py-3.5 text-sm font-medium transition-all border-b-2 whitespace-nowrap {{ $period === 'daily' ? 'text-blue-600 border-blue-600 bg-blue-50/50' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-200' }}">
                     Daily Report
                 </a>
-                <a href="{{ route('admin.reports.index', ['period' => 'monthly']) }}" 
+                <a href="{{ route('owner.reports.index', ['period' => 'monthly']) }}" 
                    class="px-6 py-3.5 text-sm font-medium transition-all border-b-2 whitespace-nowrap {{ $period === 'monthly' ? 'text-blue-600 border-blue-600 bg-blue-50/50' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-200' }}">
                     Monthly Report
                 </a>
-                <a href="{{ route('admin.reports.index', ['period' => 'yearly']) }}" 
+                <a href="{{ route('owner.reports.index', ['period' => 'yearly']) }}" 
                    class="px-6 py-3.5 text-sm font-medium transition-all border-b-2 whitespace-nowrap {{ $period === 'yearly' ? 'text-blue-600 border-blue-600 bg-blue-50/50' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-200' }}">
                     Yearly Report
                 </a>
@@ -140,14 +140,14 @@
                 <p class="text-sm text-gray-500 mt-1">Daftar transaksi yang telah diselesaikan</p>
             </div>
             
-            <a href="{{ route('admin.reports.export', array_merge(['period' => $period], request()->query())) }}" 
+            <a href="{{ route('owner.reports.export', array_merge(['period' => $period], request()->query())) }}" 
                 class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 rounded-lg font-semibold text-sm transition-colors border border-emerald-200">
                 <i class="fas fa-file-excel"></i> Export Excel
             </a>
         </div>
 
         <div class="p-6 bg-gray-50/50 border-b border-gray-100">
-            <form id="autoFilterForm" method="GET" action="{{ route('admin.reports.index') }}">
+            <form id="autoFilterForm" method="GET" action="{{ route('owner.reports.index') }}">
                 <input type="hidden" name="period" value="{{ $period }}">
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">

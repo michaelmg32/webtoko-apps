@@ -223,7 +223,7 @@ class ReportController extends Controller
 
         $recentOrders = $paidOrders;
 
-        return view('admin.reports', [
+        return view('owner.reports', [
             'totalRevenue' => $totalRevenue,
             'revenueByCategory' => $revenueByCategory,
             'revenueByPaymentMethod' => $revenueByPaymentMethod,
@@ -260,7 +260,7 @@ class ReportController extends Controller
         $revenueByCategory = collect([]);
         $recentOrders = collect([]);
 
-        return view('admin.reports', [
+        return view('owner.reports', [
             'totalRevenue' => $totalRevenue,
             'revenueByCategory' => $revenueByCategory,
             'recentOrders' => $recentOrders,

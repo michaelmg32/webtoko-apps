@@ -27,7 +27,7 @@
                 <p class="text-xl font-black text-blue-600 leading-none">{{ $users->count() }}</p>
                 </div>
                 
-                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95 gap-2 group">
+                <a href="{{ route('owner.users.create') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95 gap-2 group">
                     <i class="fas fa-plus text-xs group-hover:rotate-90 transition-transform"></i>
                     Tambah Pengguna
                 </a>
@@ -122,13 +122,13 @@
 
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('admin.users.edit', $user) }}" 
+                                        <a href="{{ route('owner.users.edit', $user) }}" 
                                            class="p-2.5 bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white rounded-xl transition-all shadow-sm"
                                            title="Edit Data">
                                             <i class="fas fa-pen text-xs"></i>
                                         </a>
                                         
-                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline deleteUserForm">
+                                        <form action="{{ route('owner.users.destroy', $user) }}" method="POST" class="inline deleteUserForm">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" 

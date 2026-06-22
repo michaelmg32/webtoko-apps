@@ -280,9 +280,11 @@
         </div>
 
         <div class="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+            @if(in_array(auth()->user()->role, ['admin', 'owner']))
             <button onclick="voidOrder()" class="flex-1 py-3.5 bg-red-50 text-red-600 rounded-2xl font-black text-sm hover:bg-red-100 transition-all border border-red-200">
                 BATALKAN PESANAN
             </button>
+            @endif
             <a id="detailPrintBtn" href="#" target="_blank" class="flex-1 py-3.5 bg-emerald-600 text-white rounded-2xl font-black text-sm hover:bg-emerald-700 transition-all text-center flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
                 <i class="fas fa-print"></i> CETAK STRUK
             </a>
@@ -601,8 +603,14 @@
             notesSection.classList.add('hidden');
         }
 
-        // Set Print Button Link
-        document.getElementById('detailPrintBtn').href = `/orders/${order.id}/receipt`;
+        // Set Print Button Link and Visibility
+        const printBtn = document.getElementById('detailPrintBtn');
+        printBtn.href = `/orders/${order.id}/receipt`;
+        if (order.payment_status && order.payment_status !== 'unpaid') {
+            printBtn.style.display = 'flex';
+        } else {
+            printBtn.style.display = 'none';
+        }
 
         document.getElementById('detailModal').classList.remove('hidden');
     }

@@ -197,11 +197,11 @@ class StatusController extends Controller
     public function voidOrder($id, Request $request)
     {
         try {
-            // Check if user is admin
-            if (Auth::user()->role !== 'admin') {
+            // Check if user is admin or owner
+            if (!in_array(Auth::user()->role, ['admin', 'owner'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Only admins can void orders'
+                    'message' => 'Only admins and owners can void orders'
                 ], 403);
             }
 

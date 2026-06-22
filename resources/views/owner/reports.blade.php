@@ -538,8 +538,14 @@
             notesSection.classList.add('hidden');
         }
 
-        // Set Print Button Link
-        document.getElementById('detailPrintBtn').href = `/orders/${order.id}/receipt`;
+        // Set Print Button Link and Visibility
+        const printBtn = document.getElementById('detailPrintBtn');
+        printBtn.href = `/orders/${order.id}/receipt`;
+        if (order.payment_status && order.payment_status !== 'unpaid') {
+            printBtn.style.display = 'flex';
+        } else {
+            printBtn.style.display = 'none';
+        }
 
         document.getElementById('detailModal').classList.remove('hidden');
     }

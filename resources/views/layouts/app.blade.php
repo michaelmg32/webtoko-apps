@@ -210,9 +210,12 @@
                         <p class="user-name text-sm font-bold text-white truncate">{{ auth()->user()->name }}</p>
                         <p class="user-role text-[10px] text-green-400 font-bold uppercase tracking-wider">{{ auth()->user()->role }}</p>
                     </div>
+                    <a href="{{ route('profile.edit') }}" class="p-2 text-slate-400 hover:text-indigo-400 transition-colors" title="Edit Profil">
+                        <i class="fas fa-cog"></i>
+                    </a>
                     <form action="{{ route('logout') }}" method="POST" class="flex-shrink-0">
                         @csrf
-                        <button type="submit" class="p-2 text-slate-400 hover:text-red-400 transition-colors">
+                        <button type="submit" class="p-2 text-slate-400 hover:text-red-400 transition-colors" title="Logout">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </form>

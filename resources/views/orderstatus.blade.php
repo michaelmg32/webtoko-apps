@@ -606,7 +606,7 @@
         // Set Print Button Link and Visibility
         const printBtn = document.getElementById('detailPrintBtn');
         printBtn.href = `/orders/${order.id}/receipt`;
-        if (order.payment_status && order.payment_status !== 'unpaid') {
+        if (order.payment_status && order.payment_status === 'paid') {
             printBtn.style.display = 'flex';
         } else {
             printBtn.style.display = 'none';

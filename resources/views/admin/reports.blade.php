@@ -158,6 +158,7 @@
                             <input type="text" id="search" name="search" 
                                    value="{{ request('search') }}"
                                    placeholder="Cari order code atau nama..."
+                                   autocomplete="off"
                                    class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
                         </div>
                     </div>
@@ -208,20 +209,35 @@
                     const filterForm = document.getElementById('autoFilterForm');
                     const filterInputs = filterForm.querySelectorAll('input[type="date"], select');
                     const searchInput = document.getElementById('search');
-                    let timeout = null;
                     
+                    // Auto-submit for dates and select dropdowns
                     filterInputs.forEach(input => {
                         input.addEventListener('change', function() {
                             filterForm.submit();
                         });
                     });
 
+                    // Frontend filtering for search input
                     if (searchInput) {
-                        searchInput.addEventListener('keyup', function(e) {
-                            clearTimeout(timeout);
-                            timeout = setTimeout(function() {
-                                filterForm.submit();
-                            }, 500);
+                        searchInput.addEventListener('input', function(e) {
+                            const term = this.value.toLowerCase();
+                            const rows = document.querySelectorAll('.report-row');
+                            let count = 0;
+                            
+                            rows.forEach(row => {
+                                const searchableText = (row.dataset.search || '').toLowerCase();
+                                if (searchableText.includes(term)) {
+                                    row.style.display = '';
+                                    count++;
+                                } else {
+                                    row.style.display = 'none';
+                                }
+                            });
+                            
+                            const countDisplay = document.getElementById('visibleCount');
+                            if (countDisplay) {
+                                countDisplay.textContent = count;
+                            }
                         });
                     }
                 });
@@ -243,7 +259,9 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($recentOrders as $order)
-                        <tr class="hover:bg-gray-50/50 transition-colors group cursor-pointer" onclick="openOrderDetail({{ $order->order_id }})">
+                        <tr class="hover:bg-gray-50/50 transition-colors group cursor-pointer report-row" 
+                            data-search="{{ strtolower(($order->order_code ?? '') . ' ' . ($order->customer_name ?? '')) }}"
+                            onclick="openOrderDetail({{ $order->order_id }})">
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900 font-medium">{{ \Carbon\Carbon::parse($order->payment_date)->format('d M Y') }}</div>
                                 <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($order->payment_date)->format('H:i') }} WIB</div>
@@ -303,7 +321,7 @@
 
             <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/30 flex justify-between items-center">
                 <p class="text-sm text-gray-600">
-                    Menampilkan total <span class="font-bold text-gray-900">{{ $recentOrders->count() }}</span> pesanan
+                    Menampilkan total <span id="visibleCount" class="font-bold text-gray-900">{{ $recentOrders->count() }}</span> pesanan
                 </p>
             </div>
         @else

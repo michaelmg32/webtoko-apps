@@ -4,6 +4,10 @@
 @section('page-title', 'Financial Performance')
 
 @section('content')
+<!-- Flatpickr CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <div class="space-y-6 max-w-7xl mx-auto pb-10">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="p-6 pb-0">
@@ -163,18 +167,16 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-1">
-                        <label for="filter_start_date" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Start Date</label>
-                        <input type="date" id="filter_start_date" name="filter_start_date" 
-                               value="{{ request('filter_start_date', $startDate->toDateString()) }}"
-                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
-                    </div>
-
-                    <div class="lg:col-span-1">
-                        <label for="filter_end_date" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">End Date</label>
-                        <input type="date" id="filter_end_date" name="filter_end_date" 
-                               value="{{ request('filter_end_date', $endDate->toDateString()) }}"
-                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
+                    <div class="lg:col-span-2">
+                        <label for="date_range" class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Date Range</label>
+                        <div class="relative">
+                            <i class="far fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10"></i>
+                            <input type="text" id="date_range" 
+                                   placeholder="Pilih rentang tanggal"
+                                   class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white cursor-pointer relative z-0">
+                        </div>
+                        <input type="hidden" id="filter_start_date" name="filter_start_date" value="{{ request('filter_start_date', $startDate->toDateString()) }}">
+                        <input type="hidden" id="filter_end_date" name="filter_end_date" value="{{ request('filter_end_date', $endDate->toDateString()) }}">
                     </div>
 
                     <div class="lg:col-span-1">
@@ -201,10 +203,26 @@
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const filterForm = document.getElementById('autoFilterForm');
-                    const filterInputs = filterForm.querySelectorAll('input[type="date"], select');
+                    const filterInputs = filterForm.querySelectorAll('select');
                     const searchInput = document.getElementById('search');
+                    const startDateInput = document.getElementById('filter_start_date');
+                    const endDateInput = document.getElementById('filter_end_date');
                     
-                    // Auto-submit for dates and select dropdowns
+                    // Initialize Flatpickr for Date Range
+                    flatpickr("#date_range", {
+                        mode: "range",
+                        dateFormat: "Y-m-d",
+                        defaultDate: [startDateInput.value, endDateInput.value],
+                        onChange: function(selectedDates, dateStr, instance) {
+                            if (selectedDates.length === 2) {
+                                startDateInput.value = instance.formatDate(selectedDates[0], "Y-m-d");
+                                endDateInput.value = instance.formatDate(selectedDates[1], "Y-m-d");
+                                filterForm.submit();
+                            }
+                        }
+                    });
+                    
+                    // Auto-submit for select dropdowns
                     filterInputs.forEach(input => {
                         input.addEventListener('change', function() {
                             filterForm.submit();
